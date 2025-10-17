@@ -1,0 +1,22 @@
+# Odoo runtime & data
+data/odoo/
+data/postgres/
+.odoo/
+.odoo_server.log
+.sessions/
+
+# Python / bytecode
+__pycache__/
+*.py[cod]
+
+# Env & secrets
+.env
+*.env.local
+
+# Editor/OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+docs/
