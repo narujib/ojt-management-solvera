@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- LIST view -->
+    <record id="view_ojt_batch_list" model="ir.ui.view">
+        <field name="name">ojt.batch.list</field>
+        <field name="model">ojt.batch</field>
+        <field name="arch" type="xml">
+            <list string="OJT Batches">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="job_id" readonly="1"/>
+                <field name="department_id"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="mode"/>
+                <field name="mentor_ids" widget="many2many_tags"/>
+                <field name="capacity"/>
+                <field name="is_published" widget="boolean_toggle" readonly="state != 'recruitment'"/>
+                <field name="progress_ratio" widget="progressbar"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- FORM view -->
+    <record id="view_ojt_batch_form" model="ir.ui.view">
+        <field name="name">ojt.batch.form</field>
+        <field name="model">ojt.batch</field>
+        <field name="arch" type="xml">
+            <form string="OJT Batch">
+                <sheet>
+                    <header>
+                        <button name="action_set_recruitment" type="object" string="Open Recruitment"
+                                class="btn-secondary" invisible="state != 'draft'"/>
+                        <button name="action_set_ongoing" type="object" string="Start"
+                                class="btn-primary" invisible="state != 'recruitment'"/>
+                        <button name="action_set_done" type="object" string="Mark Done"
+                                class="btn-secondary" invisible="state != 'ongoing'"/>
+                        <button name="action_set_cancel" type="object" string="Cancel"
+                                class="btn-danger" invisible="not (state in ['draft', 'ongoing'])"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,recruitment,ongoing,done,cancel"/>
+                        <field name="is_published" widget="boolean_toggle" nolabel="1" readonly="state != 'recruitment'"/>
+                    </header>
+
+                    <div class="oe_button_box" name="button_box">
+                        <!-- Smart buttons reserved for future use -->
+                    </div>
+
+                    <group col="2">
+                        <group string="Batch">
+                            <field name="name"/>
+                            <field name="code" readonly="1"/>
+                            <field name="job_id" readonly="1" help="Linked HR Job (auto-synced from Batch)."/>
+                            <field name="department_id"/>
+                            <field name="mode"/>
+                            <field name="mentor_ids" widget="many2many_tags"/>
+                        </group>
+                        <group string="Schedule &amp; Rules">
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                            <field name="capacity"/>
+                            <field name="attendance_threshold"/>
+                            <field name="score_threshold"/>
+                            <field name="progress_ratio" widget="progressbar" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Description">
+                            <field name="description" placeholder="Short summary, objectives, notes..."/>
+                        </page>
+
+                        <page string="Participants">
+                            <field name="participant_ids">
+                                <list editable="bottom">
+                                    <field name="name"/>
+                                    <field name="partner_id"/>
+                                </list>
+                                <form>
+                                    <group>
+                                        <field name="name"/>
+                                        <field name="partner_id"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+
+                        <page string="Event Links">
+                            <field name="event_link_ids">
+                                <list editable="bottom">
+                                    <field name="name"/>
+                                    <field name="date_start"/>
+                                    <field name="date_end"/>
+                                </list>
+                                <form>
+                                    <group>
+                                        <field name="name"/>
+                                        <group>
+                                            <field name="date_start"/>
+                                            <field name="date_end"/>
+                                        </group>
+                                        <field name="notes"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+
+                        <page string="Courses">
+                            <field name="course_ids" widget="many2many_tags"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

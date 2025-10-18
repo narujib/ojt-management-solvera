@@ -16,6 +16,10 @@
         'mail',
     ],
     'data': [
+        'data/ir_sequence.xml',
+        'security/ir.model.access.csv',
+        'views/menu.xml',
+        'views/ojt_batch_views.xml',
     ],
     'application': True,
     'installable': True,

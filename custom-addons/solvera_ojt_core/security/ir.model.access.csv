@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ojt_batch_system,access_ojt_batch_system,model_ojt_batch,base.group_system,1,1,1,1
+access_ojt_batch_user,access_ojt_batch_user,model_ojt_batch,base.group_user,1,0,0,0
+access_ojt_participant_system,access_ojt_participant_system,model_ojt_participant,base.group_system,1,1,1,1
+access_ojt_participant_user,access_ojt_participant_user,model_ojt_participant,base.group_user,1,0,0,0
+access_ojt_event_link_system,access_ojt_event_link_system,model_ojt_event_link,base.group_system,1,1,1,1
+access_ojt_event_link_user,access_ojt_event_link_user,model_ojt_event_link,base.group_user,1,0,0,0
