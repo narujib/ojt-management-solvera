@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_ojt_submission" model="ir.actions.act_window">
+        <field name="name">Submissions</field>
+        <field name="res_model">ojt.submission</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <menuitem id="menu_ojt_submission" name="Submissions" parent="menu_ojt_root" action="action_ojt_submission" sequence="26"/>
+
+    <record id="view_ojt_submission_list" model="ir.ui.view">
+        <field name="name">ojt.submission.list</field>
+        <field name="model">ojt.submission</field>
+        <field name="arch" type="xml">
+            <list string="Submissions">
+                <field name="assignment_id"/>
+                <field name="participant_id" required="1" domain="[('batch_id', '=', assignment_batch_id)]"/>
+                <field name="submitted_on"/>
+                <field name="late"/>
+                <field name="score"/>
+                <field name="reviewer_id"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ojt_submission_form" model="ir.ui.view">
+        <field name="name">ojt.submission.form</field>
+        <field name="model">ojt.submission</field>
+        <field name="arch" type="xml">
+            <form string="Submission">
+                <sheet>
+                    <header>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,submitted,scored"/>
+                        <button name="action_submit" type="object" string="Submit" class="btn-primary" invisible="state != 'draft'"/>
+                        <button name="action_score" type="object" string="Mark Scored" invisible="state != 'submitted'"/>
+                    </header>
+                    <group col="2">
+                        <group>
+                            <field name="assignment_id" required="1"/>
+                            <field name="participant_id" required="1" domain="[('batch_id', '=', assignment_batch_id)]"/>
+                            <field name="submitted_on"/>
+                            <field name="late" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="score"/>
+                            <field name="reviewer_id"/>
+                            <field name="submission_url" widget="url"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="attachment_ids" widget="many2many_binary"/>
+                    </group>
+                    <group>
+                        <field name="feedback"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

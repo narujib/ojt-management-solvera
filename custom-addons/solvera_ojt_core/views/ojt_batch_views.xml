@@ -140,6 +140,39 @@
                         <page string="Courses">
                             <field name="course_ids" widget="many2many_tags"/>
                         </page>
+                    
+                        <page string="Assignments">
+                            <field name="assignment_ids">
+                                <list editable="bottom">
+                                    <field name="name"/>
+                                    <field name="event_link_id" domain="[('batch_id', '=', parent.id)]"/>
+                                    <field name="type"/>
+                                    <field name="deadline"/>
+                                    <field name="max_score"/>
+                                    <field name="weight"/>
+                                    <field name="state"/>
+                                    <field name="submit_count"/>
+                                </list>
+                                <form>
+                                    <group col="2">
+                                        <group>
+                                            <field name="name"/>
+                                            <field name="event_link_id" domain="[('batch_id', '=', parent.id)]"/>
+                                            <field name="type"/>
+                                        </group>
+                                        <group>
+                                            <field name="deadline"/>
+                                            <field name="max_score"/>
+                                            <field name="weight"/>
+                                            <field name="attachment_required"/>
+                                        </group>
+                                    </group>
+                                    <group>
+                                        <field name="description"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
                     </notebook>
                 </sheet>
             </form>

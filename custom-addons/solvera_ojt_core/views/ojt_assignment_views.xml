@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_ojt_assignment" model="ir.actions.act_window">
+        <field name="name">Assignments</field>
+        <field name="res_model">ojt.assignment</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <menuitem id="menu_ojt_assignment" name="Assignments" parent="menu_ojt_root" action="action_ojt_assignment" sequence="25"/>
+
+    <record id="view_ojt_assignment_list" model="ir.ui.view">
+        <field name="name">ojt.assignment.list</field>
+        <field name="model">ojt.assignment</field>
+        <field name="arch" type="xml">
+            <list string="Assignments">
+                <field name="name"/>
+                <field name="batch_id"/>
+                <field name="event_link_id"/>
+                <field name="type"/>
+                <field name="deadline"/>
+                <field name="max_score"/>
+                <field name="weight"/>
+                <field name="state"/>
+                <field name="submit_count"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ojt_assignment_form" model="ir.ui.view">
+        <field name="name">ojt.assignment.form</field>
+        <field name="model">ojt.assignment</field>
+        <field name="arch" type="xml">
+            <form string="Assignment">
+                <sheet>
+                    <header>
+                            <button class="oe_stat_button" type="object" name="action_open_submissions">
+                                <field name="submit_count" widget="statinfo" string="Submissions"/>
+                            </button>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,open,closed"/>
+                        <button name="action_open" type="object" string="Open" class="btn-primary" invisible="state != 'draft'"/>
+                        <button name="action_close" type="object" string="Close" invisible="state != 'open'"/>
+                        <button name="action_reset_draft" type="object" string="Reset to Draft" invisible="state != 'closed'"/>
+                    </header>
+                    <group col="2">
+                        <group>
+                            <field name="name"/>
+                            <field name="batch_id" required="1"/>
+                            <field name="event_link_id" domain="[('batch_id', '=', batch_id)]"/>
+                            <field name="type"/>
+                        </group>
+                        <group>
+                            <field name="deadline"/>
+                            <field name="max_score"/>
+                            <field name="weight"/>
+                            <field name="attachment_required"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description">
+                            <field name="description"/>
+                        </page>
+                        <page string="Submissions">
+                            <field name="submission_ids">
+                                <list editable="bottom">
+                                    <field name="participant_id" required="1" domain="[('batch_id', '=', parent.batch_id)]"/>
+                                    <field name="submitted_on"/>
+                                    <field name="late"/>
+                                    <field name="score"/>
+                                    <field name="reviewer_id"/>
+                                    <field name="state"/>
+                                </list>
+                                <form>
+                                    <group col="2">
+                                        <group>
+                                            <field name="participant_id" required="1" domain="[('batch_id', '=', parent.batch_id)]"/>
+                                            <field name="submitted_on"/>
+                                            <field name="late" readonly="1"/>
+                                            <field name="state" widget="statusbar" statusbar_visible="draft,submitted,scored"/>
+                                        </group>
+                                        <group>
+                                            <field name="score"/>
+                                            <field name="reviewer_id"/>
+                                            <field name="submission_url" widget="url"/>
+                                        </group>
+                                    </group>
+                                    <group>
+                                        <field name="attachment_ids" widget="many2many_binary"/>
+                                    </group>
+                                    <group>
+                                        <field name="feedback"/>
+                                    </group>
+                                    <footer>
+                                        <button string="Submit" name="action_submit" type="object" class="btn-primary" invisible="state != 'draft'"/>
+                                        <button string="Mark Scored" name="action_score" type="object" invisible="state != 'submitted'"/>
+                                    </footer>
+                                </form>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

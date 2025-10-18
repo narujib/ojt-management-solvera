@@ -16,7 +16,7 @@ class OjtBatch(models.Model):
     job_id = fields.Many2one("hr.job", string="Recruitment Job", readonly=True, ondelete="restrict")
     department_id = fields.Many2one("hr.department", string="Department")
 
-    # Additional fields
+    # People & relations
     mentor_ids = fields.Many2many(
         "res.partner", "ojt_batch_mentor_rel", "batch_id", "partner_id",
         string="Mentors", help="List of mentors for this batch."
@@ -27,6 +27,7 @@ class OjtBatch(models.Model):
         "slide.channel", "ojt_batch_course_rel", "batch_id", "channel_id",
         string="Courses"
     )
+    assignment_ids = fields.One2many("ojt.assignment", "batch_id", string="Assignments")
 
     # Mirrored to hr.job
     capacity = fields.Integer(
@@ -48,7 +49,7 @@ class OjtBatch(models.Model):
     start_date = fields.Date(string="Start Date", required=True)
     end_date = fields.Date(string="End Date", required=True)
     mode = fields.Selection(
-        [("online", "Online"), ("offline", "Offline"), ("hybrid", "Hybrid")],
+        [("online","Online"),("offline","Offline"),("hybrid","Hybrid")],
         string="Mode", default="offline", required=True
     )
 
@@ -56,7 +57,7 @@ class OjtBatch(models.Model):
     attendance_threshold = fields.Float(string="Certificate Rule (Attendance %)", default=80.0)
     score_threshold = fields.Float(string="Certificate Rule (Score)", default=70.0)
 
-    # Publish (mirrors hr.job publish state)
+    # Publish (mirror from hr.job)
     is_published = fields.Boolean(
         string="Published",
         compute="_compute_is_published",
@@ -65,7 +66,7 @@ class OjtBatch(models.Model):
         help="Publish state of the related HR Job (website)."
     )
 
-    # Progress (informational)
+    # Progress
     progress_ratio = fields.Float(
         string="Progress Ratio",
         compute="_compute_progress_ratio",
@@ -74,7 +75,7 @@ class OjtBatch(models.Model):
     )
 
     state = fields.Selection(
-        [("draft", "Draft"), ("recruitment", "Recruitment"), ("ongoing", "Ongoing"), ("done", "Done"), ("cancel", "Cancelled")],
+        [("draft","Draft"),("recruitment","Recruitment"),("ongoing","Ongoing"),("done","Done"),("cancel","Cancelled")],
         string="State", default="draft", tracking=True, required=True
     )
 
@@ -122,9 +123,9 @@ class OjtBatch(models.Model):
         fname = self._job_publish_field_name()
         for rec in self:
             if rec.job_id and fname:
-                # Only allow publish=True when ongoing (unpublish allowed anytime via server)
+                # Only allow publish=True when recruitment (unpublish allowed anytime via server)
                 if bool(rec.is_published) and rec.state != "recruitment":
-                    raise ValidationError(_("You can publish only when the batch status is Ongoing."))
+                    raise ValidationError(_("You can publish only when the batch status is Recruitment."))
                 rec.job_id.with_context(ojt_batch_sync=True).write({fname: bool(rec.is_published)})
 
     @api.depends("start_date", "end_date")
@@ -138,6 +139,7 @@ class OjtBatch(models.Model):
             elapsed = (min(today, rec.end_date) - rec.start_date).days
             rec.progress_ratio = max(0.0, min(100.0, (elapsed / total) * 100.0))
 
+    # ----------- Helpers -----------
     def _auto_unpublish_if_needed(self):
         """Unpublish the linked HR Job when batch state is not 'recruitment'."""
         fname = self._job_publish_field_name()
@@ -149,6 +151,7 @@ class OjtBatch(models.Model):
                 except Exception:
                     rec.job_id.with_context(ojt_batch_sync=True).write({fname: False})
 
+    # ----------- Actions -----------
     def action_set_recruitment(self):
         for rec in self:
             rec.state = "recruitment"
@@ -178,10 +181,7 @@ class OjtBatch(models.Model):
     @api.constrains("attendance_threshold", "score_threshold")
     def _check_thresholds(self):
         for rec in self:
-            for val, label in [
-                (rec.attendance_threshold, _("Attendance Threshold")),
-                (rec.score_threshold, _("Score Threshold")),
-            ]:
+            for val, label in [(rec.attendance_threshold, _("Attendance Threshold")), (rec.score_threshold, _("Score Threshold"))]:
                 if val is not None and (val < 0.0 or val > 100.0):
                     raise ValidationError(_("%s must be within 0..100.") % label)
 
@@ -216,24 +216,19 @@ class OjtBatch(models.Model):
     def write(self, vals):
         # Track which records are published and will leave 'recruitment'
         leaving_ids = set()
-        if 'state' in vals:
-            new_state = vals.get('state')
+        if "state" in vals:
+            new_state = vals.get("state")
             for rec in self:
-                if new_state != 'recruitment':
-                    # Check current publish status from HR Job
+                if new_state != "recruitment":
                     fname = rec._job_publish_field_name()
                     if fname and rec.job_id and bool(rec.job_id[fname]):
                         leaving_ids.add(rec.id)
-
         res = super().write(vals)
-
-        # After write, unpublish those that left recruitment
         if leaving_ids:
             for rec in self.browse(list(leaving_ids)):
                 fname = rec._job_publish_field_name()
                 if fname and rec.job_id:
                     rec.job_id.with_context(ojt_batch_sync=True).write({fname: False})
-
         # Existing syncs
         for rec in self:
             if "name" in vals and rec.job_id:
@@ -244,5 +239,4 @@ class OjtBatch(models.Model):
                 rec._inverse_description()
             if "is_published" in vals:
                 rec._inverse_is_published()
-
         return res

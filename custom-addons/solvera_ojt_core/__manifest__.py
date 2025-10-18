@@ -21,7 +21,9 @@
         'views/menu.xml',
         'views/ojt_batch_views.xml',
         'views/ojt_event_link_views.xml',
-        'views/ojt_participant_views.xml'
+        'views/ojt_participant_views.xml',
+        'views/ojt_assignment_views.xml',
+        'views/ojt_submission_views.xml'
     ],
     'application': True,
     'installable': True,

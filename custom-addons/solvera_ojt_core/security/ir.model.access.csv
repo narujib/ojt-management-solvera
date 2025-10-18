@@ -7,3 +7,7 @@ access_ojt_event_link_system,access_ojt_event_link_system,model_ojt_event_link,b
 access_ojt_event_link_user,access_ojt_event_link_user,model_ojt_event_link,base.group_user,1,0,0,0
 access_ojt_certificate_system,access_ojt_certificate_system,model_ojt_certificate,base.group_system,1,1,1,1
 access_ojt_certificate_user,access_ojt_certificate_user,model_ojt_certificate,base.group_user,1,0,0,0
+access_ojt_assignment_system,access_ojt_assignment_system,model_ojt_assignment,base.group_system,1,1,1,1
+access_ojt_assignment_user,access_ojt_assignment_user,model_ojt_assignment,base.group_user,1,0,0,0
+access_ojt_submission_system,access_ojt_submission_system,model_ojt_submission,base.group_system,1,1,1,1
+access_ojt_submission_user,access_ojt_submission_user,model_ojt_submission,base.group_user,1,0,0,0

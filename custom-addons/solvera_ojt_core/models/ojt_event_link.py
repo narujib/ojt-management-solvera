@@ -6,6 +6,7 @@ class OjtEventLink(models.Model):
     _name = "ojt.event.link"
     _description = "OJT Event Link"
     _order = "date_start, id"
+    _rec_name = "title"
 
     batch_id = fields.Many2one("ojt.batch", string="Batch", required=True, ondelete="cascade", index=True)
     event_id = fields.Many2one("event.event", string="Event")
