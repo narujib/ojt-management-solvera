@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Action + Menu -->
+    <record id="action_ojt_participant" model="ir.actions.act_window">
+        <field name="name">Participants</field>
+        <field name="res_model">ojt.participant</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <menuitem id="menu_ojt_participant" name="Participants" parent="menu_ojt_root" action="action_ojt_participant" sequence="15"/>
+
+    <!-- LIST -->
+    <record id="view_ojt_participant_list" model="ir.ui.view">
+        <field name="name">ojt.participant.list</field>
+        <field name="model">ojt.participant</field>
+        <field name="arch" type="xml">
+            <list string="Participants">
+                <field name="name"/>
+                <field name="batch_id"/>
+                <field name="partner_id"/>
+                <field name="applicant_id"/>
+                <field name="attendance_rate"/>
+                <field name="average_score"/>
+                <field name="final_score"/>
+                <field name="mentor_score"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- FORM -->
+    <record id="view_ojt_participant_form" model="ir.ui.view">
+        <field name="name">ojt.participant.form</field>
+        <field name="model">ojt.participant</field>
+        <field name="arch" type="xml">
+            <form string="Participant">
+                <sheet>
+                    <header>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,active,completed,failed,left"/>
+                        <button name="action_set_active" type="object" string="Activate" class="btn-primary" invisible="state != 'draft'"/>
+                        <button name="action_set_completed" type="object" string="Mark Completed" invisible="state != 'active'"/>
+                        <button name="action_set_failed" type="object" string="Mark Failed" invisible="state != 'active'"/>
+                        <button name="action_set_left" type="object" string="Mark Left" invisible="state != 'active'"/>
+                        <button name="action_set_draft" type="object" string="Reset to Draft" invisible="state != 'failed' and state != 'left' and state != 'completed'"/>
+                    </header>
+                    <group col="2">
+                        <group string="Identity">
+                            <field name="name" readonly="1"/>
+                            <field name="batch_id" required="1"/>
+                            <field name="partner_id" required="1"/>
+                            <field name="applicant_id"/>
+                            <field name="portal_token"/>
+                        </group>
+                        <group string="Scores &amp; Attendance">
+                            <field name="attendance_rate"/>
+                            <field name="average_score"/>
+                            <field name="final_score"/>
+                            <field name="mentor_score"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Certificates">
+                            <field name="certificate_ids">
+                                <list editable="bottom">
+                                    <field name="name"/>
+                                    <field name="date_issued"/>
+                                </list>
+                                <form>
+                                    <group>
+                                        <field name="name"/>
+                                        <field name="date_issued"/>
+                                        <field name="notes"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

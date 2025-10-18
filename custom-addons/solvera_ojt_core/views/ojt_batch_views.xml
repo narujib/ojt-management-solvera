@@ -73,13 +73,32 @@
                         <page string="Participants">
                             <field name="participant_ids">
                                 <list editable="bottom">
-                                    <field name="name"/>
+                                    <field name="name" readonly="1"/>
                                     <field name="partner_id"/>
+                                    <field name="applicant_id"/>
+                                    <field name="attendance_rate"/>
+                                    <field name="average_score"/>
+                                    <field name="final_score"/>
+                                    <field name="mentor_score"/>
+                                    <field name="state"/>
                                 </list>
                                 <form>
+                                    <group col="2">
+                                        <group string="Identity">
+                                            <field name="name" readonly="1"/>
+                                            <field name="partner_id" required="1"/>
+                                            <field name="applicant_id"/>
+                                            <field name="portal_token"/>
+                                        </group>
+                                        <group string="Scores &amp; Attendance">
+                                            <field name="attendance_rate"/>
+                                            <field name="average_score"/>
+                                            <field name="final_score"/>
+                                            <field name="mentor_score"/>
+                                        </group>
+                                    </group>
                                     <group>
-                                        <field name="name"/>
-                                        <field name="partner_id"/>
+                                        <field name="notes"/>
                                     </group>
                                 </form>
                             </field>

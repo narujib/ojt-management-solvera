@@ -20,7 +20,8 @@
         'security/ir.model.access.csv',
         'views/menu.xml',
         'views/ojt_batch_views.xml',
-        'views/ojt_event_link_views.xml'
+        'views/ojt_event_link_views.xml',
+        'views/ojt_participant_views.xml'
     ],
     'application': True,
     'installable': True,
