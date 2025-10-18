@@ -173,6 +173,38 @@
                                 </form>
                             </field>
                         </page>
+
+                        <page string="Attendance">
+                            <field name="attendance_ids">
+                                <list editable="bottom">
+                                    <field name="event_link_id" domain="[('batch_id', '=', parent.id)]"/>
+                                    <field name="participant_id" domain="[('batch_id', '=', parent.id)]"/>
+                                    <field name="check_in"/>
+                                    <field name="check_out"/>
+                                    <field name="presence"/>
+                                    <field name="method"/>
+                                    <field name="duration_minutes"/>
+                                </list>
+                                <form>
+                                    <group col="2">
+                                        <group>
+                                            <field name="event_link_id" domain="[('batch_id', '=', parent.id)]"/>
+                                            <field name="participant_id" required="1" domain="[('batch_id', '=', parent.id)]"/>
+                                            <field name="presence"/>
+                                            <field name="method"/>
+                                        </group>
+                                        <group>
+                                            <field name="check_in"/>
+                                            <field name="check_out"/>
+                                            <field name="duration_minutes" readonly="1"/>
+                                        </group>
+                                    </group>
+                                    <group>
+                                        <field name="notes"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
                     </notebook>
                 </sheet>
             </form>

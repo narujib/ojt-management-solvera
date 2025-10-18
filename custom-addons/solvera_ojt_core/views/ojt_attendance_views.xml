@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Action & Menu -->
+    <record id="action_ojt_attendance" model="ir.actions.act_window">
+        <field name="name">Attendance</field>
+        <field name="res_model">ojt.attendance</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <menuitem id="menu_ojt_attendance" name="Attendance"
+              parent="menu_ojt_root" action="action_ojt_attendance" sequence="35"/>
+
+    <!-- List -->
+    <record id="view_ojt_attendance_list" model="ir.ui.view">
+        <field name="name">ojt.attendance.list</field>
+        <field name="model">ojt.attendance</field>
+        <field name="arch" type="xml">
+            <list string="Attendance">
+                <field name="batch_id"/>
+                <field name="event_link_id"/>
+                <field name="participant_id"/>
+                <field name="check_in"/>
+                <field name="check_out"/>
+                <field name="presence"/>
+                <field name="method"/>
+                <field name="duration_minutes"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form -->
+    <record id="view_ojt_attendance_form" model="ir.ui.view">
+        <field name="name">ojt.attendance.form</field>
+        <field name="model">ojt.attendance</field>
+        <field name="arch" type="xml">
+            <form string="Attendance">
+                <sheet>
+                    <group col="2">
+                        <group>
+                            <field name="batch_id" required="1"/>
+                            <field name="event_link_id" domain="[('batch_id', '=', batch_id)]"/>
+                            <field name="participant_id" required="1" domain="[('batch_id', '=', batch_id)]"/>
+                            <field name="presence"/>
+                            <field name="method"/>
+                        </group>
+                        <group>
+                            <field name="check_in"/>
+                            <field name="check_out"/>
+                            <field name="duration_minutes" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="notes"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

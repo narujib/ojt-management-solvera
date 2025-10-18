@@ -6,3 +6,4 @@ from . import ojt_event_link
 from . import ojt_certificate
 from . import ojt_assignment
 from . import ojt_submission
+from . import ojt_attendance

@@ -74,6 +74,11 @@ class OjtBatch(models.Model):
         help="Auto-calculated based on date window (%)."
     )
 
+    attendance_ids = fields.One2many(
+        "ojt.attendance", "batch_id",
+        string="Attendance"
+    )
+
     state = fields.Selection(
         [("draft","Draft"),("recruitment","Recruitment"),("ongoing","Ongoing"),("done","Done"),("cancel","Cancelled")],
         string="State", default="draft", tracking=True, required=True
