@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Action & Menu -->
     <record id="action_ojt_certificate" model="ir.actions.act_window">
         <field name="name">Certificates</field>
         <field name="res_model">ojt.certificate</field>
@@ -9,7 +8,6 @@
     <menuitem id="menu_ojt_certificate" name="Certificates"
               parent="menu_ojt_root" action="action_ojt_certificate" sequence="40"/>
 
-    <!-- List -->
     <record id="view_ojt_certificate_list" model="ir.ui.view">
         <field name="name">ojt.certificate.list</field>
         <field name="model">ojt.certificate</field>
@@ -27,7 +25,6 @@
         </field>
     </record>
 
-    <!-- Form -->
     <record id="view_ojt_certificate_form" model="ir.ui.view">
         <field name="name">ojt.certificate.form</field>
         <field name="model">ojt.certificate</field>
@@ -60,9 +57,9 @@
 
                     <group col="2">
                         <group>
-                            <field name="attendance_rate"/>
-                            <field name="final_score"/>
-                            <field name="grade"/>
+                            <field name="attendance_rate" readonly="1"/>
+                            <field name="final_score" readonly="1"/>
+                            <field name="grade" readonly="1"/>
                         </group>
                         <group>
                             <field name="pdf_report" filename="serial_number"/>
