@@ -88,17 +88,30 @@
                         <page string="Event Links">
                             <field name="event_link_ids">
                                 <list editable="bottom">
-                                    <field name="name"/>
+                                    <field name="event_id"/>
+                                    <field name="title" readonly="1"/>
                                     <field name="date_start"/>
                                     <field name="date_end"/>
+                                    <field name="instructor_id"/>
+                                    <field name="mandatory"/>
+                                    <field name="weight"/>
                                 </list>
                                 <form>
-                                    <group>
-                                        <field name="name"/>
+                                    <group col="2">
+                                        <group>
+                                            <field name="event_id"/>
+                                            <field name="title" readonly="1"/>
+                                            <field name="instructor_id"/>
+                                            <field name="mandatory"/>
+                                            <field name="weight"/>
+                                        </group>
                                         <group>
                                             <field name="date_start"/>
                                             <field name="date_end"/>
+                                            <field name="online_meeting_url" widget="url"/>
                                         </group>
+                                    </group>
+                                    <group>
                                         <field name="notes"/>
                                     </group>
                                 </form>

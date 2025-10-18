@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Standalone list/form for Event Links -->
+    <record id="action_ojt_event_link" model="ir.actions.act_window">
+        <field name="name">Event Links</field>
+        <field name="res_model">ojt.event.link</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p>Manage agenda/sessions linked to OJT batches.</p>
+        </field>
+    </record>
+    <menuitem id="menu_ojt_event_link" name="Event Links" parent="menu_ojt_root" action="action_ojt_event_link" sequence="20"/>
+
+    <record id="view_ojt_event_link_list" model="ir.ui.view">
+        <field name="name">ojt.event.link.list</field>
+        <field name="model">ojt.event.link</field>
+        <field name="arch" type="xml">
+            <list string="Event Links">
+                <field name="batch_id"/>
+                <field name="event_id"/>
+                <field name="title"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="instructor_id"/>
+                <field name="mandatory"/>
+                <field name="weight"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ojt_event_link_form" model="ir.ui.view">
+        <field name="name">ojt.event.link.form</field>
+        <field name="model">ojt.event.link</field>
+        <field name="arch" type="xml">
+            <form string="Event Link">
+                <sheet>
+                    <group col="2">
+                        <group>
+                            <field name="batch_id"/>
+                            <field name="event_id"/>
+                            <field name="title" readonly="1"/>
+                            <field name="instructor_id"/>
+                            <field name="mandatory"/>
+                            <field name="weight"/>
+                        </group>
+                        <group>
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                            <field name="online_meeting_url" widget="url"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="notes" placeholder="Technical notes, room/URL details, etc."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>
