@@ -62,14 +62,48 @@
                             <field name="certificate_ids">
                                 <list editable="bottom">
                                     <field name="name"/>
-                                    <field name="date_issued"/>
+                                    <field name="batch_id"/>
+                                    <field name="serial_number"/>
+                                    <field name="issued_on"/>
+                                    <field name="grade"/>
+                                    <field name="state"/>
                                 </list>
                                 <form>
+                                    <group col="2">
+                                        <group>
+                                            <field name="name" required="1"/>
+                                            <field name="batch_id" required="1"/>
+                                            <field name="participant_id" readonly="1"/>
+                                            <field name="partner_id" readonly="1"/>
+                                        </group>
+                                        <group>
+                                            <field name="serial_number" readonly="1"/>
+                                            <field name="qr_token" readonly="1"/>
+                                            <field name="issued_on"/>
+                                            <field name="state" widget="statusbar" statusbar_visible="draft,issued,revoked"/>
+                                        </group>
+                                    </group>
+                                    <group col="2">
+                                        <group>
+                                            <field name="attendance_rate"/>
+                                            <field name="final_score"/>
+                                            <field name="grade"/>
+                                        </group>
+                                        <group>
+                                            <field name="pdf_report" filename="serial_number"/>
+                                        </group>
+                                    </group>
                                     <group>
-                                        <field name="name"/>
-                                        <field name="date_issued"/>
                                         <field name="notes"/>
                                     </group>
+                                    <footer>
+                                        <button name="action_issue" string="Issue" type="object"
+                                                class="btn-primary" invisible="state != 'draft'"/>
+                                        <button name="action_revoke" string="Revoke" type="object"
+                                                invisible="state != 'issued'"/>
+                                        <button name="action_reset_draft" string="Reset to Draft" type="object"
+                                                invisible="state == 'draft'"/>
+                                    </footer>
                                 </form>
                             </field>
                         </page>

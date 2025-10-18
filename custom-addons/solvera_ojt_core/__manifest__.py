@@ -17,6 +17,7 @@
     ],
     'data': [
         'data/ir_sequence.xml',
+        'data/ir_sequence_certificate.xml',
         'security/ir.model.access.csv',
         'views/menu.xml',
         'views/ojt_batch_views.xml',
@@ -25,6 +26,7 @@
         'views/ojt_assignment_views.xml',
         'views/ojt_submission_views.xml',
         'views/ojt_attendance_views.xml',
+        'views/ojt_certificate_views.xml',
     ],
     'application': True,
     'installable': True,
