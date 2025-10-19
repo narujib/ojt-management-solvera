@@ -75,7 +75,7 @@
                                 <list editable="bottom">
                                     <field name="name" readonly="1"/>
                                     <field name="partner_id"/>
-                                    <field name="applicant_id"/>
+                                    <field name="applicant_id" domain="[('job_id', '=', parent.job_id)]"/>
                                     <field name="attendance_rate"/>
                                     <field name="average_score"/>
                                     <field name="final_score"/>
@@ -87,7 +87,7 @@
                                         <group string="Identity">
                                             <field name="name" readonly="1"/>
                                             <field name="partner_id" required="1"/>
-                                            <field name="applicant_id"/>
+                                            <field name="applicant_id" domain="[('job_id', '=', parent.job_id)]"/>
                                             <field name="portal_token"/>
                                         </group>
                                         <group string="Scores &amp; Attendance">

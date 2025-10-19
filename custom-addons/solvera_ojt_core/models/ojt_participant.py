@@ -23,6 +23,11 @@ class OjtParticipant(models.Model):
     )
     applicant_id = fields.Many2one("hr.applicant", string="Applicant", ondelete="set null")
 
+    batch_job_id = fields.Many2one(
+        'hr.job', string='Batch Job',
+        related='batch_id.job_id', store=True, readonly=True
+    )
+
     # Links (needed for compute dependencies)
     submission_ids = fields.One2many(
         "ojt.submission", "participant_id", string="Submissions"
@@ -148,3 +153,10 @@ class OjtParticipant(models.Model):
     def action_set_failed(self): self.write({"state": "failed"})
     def action_set_left(self): self.write({"state": "left"})
     def action_set_draft(self): self.write({"state": "draft"})
+
+    @api.constrains("applicant_id", "partner_id")
+    def _check_applicant_partner(self):
+        for rec in self:
+            if rec.applicant_id and rec.partner_id and getattr(rec.applicant_id, "partner_id", False):
+                if rec.applicant_id.partner_id.id != rec.partner_id.id:
+                    raise ValidationError(_("Applicant's partner must match the Participant's partner."))
