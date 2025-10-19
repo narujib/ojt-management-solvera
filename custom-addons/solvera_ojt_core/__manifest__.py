@@ -17,6 +17,7 @@
     ],
     'data': [
         'data/ir_sequence.xml',
+        'data/mail_template_applicant_stage.xml',
         'security/ir.model.access.csv',
         'views/menu.xml',
         'views/ojt_batch_views.xml',

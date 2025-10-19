@@ -1,0 +1,17 @@
+
+<odoo>
+    <record id="mail_tmpl_applicant_stage_default" model="mail.template">
+        <field name="name">Applicant Stage Notification (Default)</field>
+        <field name="model_id" ref="hr_recruitment.model_hr_applicant"/>
+        <field name="subject">[{{ object.company_id.name }}] Application Update: {{ object.stage_id.name }}</field>
+        <field name="email_from">{{ (object.company_id.email or user.email) or '' }}</field>
+        <field name="auto_delete" eval="True"/>
+        <field name="body_html"><![CDATA[
+            <p>Hello {{ object.partner_id.name or object.partner_name }},</p>
+            <p>Your application for <b>{{ object.job_id.name }}</b> has moved to stage:
+               <b>{{ object.stage_id.name }}</b>.</p>
+            <p>Regards,<br/>{{ object.company_id.name }}</p>
+        ]]></field>
+    </record>
+</odoo>
+
