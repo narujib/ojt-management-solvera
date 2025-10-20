@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Action + Menu -->
+
+    <!-- Action: open Participants with list/form -->
     <record id="action_ojt_participant" model="ir.actions.act_window">
         <field name="name">Participants</field>
         <field name="res_model">ojt.participant</field>
         <field name="view_mode">list,form</field>
     </record>
+
+    <!-- Menu: Participants under OJT root -->
     <menuitem id="menu_ojt_participant" name="Participants" parent="menu_ojt_root" action="action_ojt_participant" sequence="15"/>
 
-    <!-- LIST -->
+    <!-- List view: participant KPIs and status -->
     <record id="view_ojt_participant_list" model="ir.ui.view">
         <field name="name">ojt.participant.list</field>
         <field name="model">ojt.participant</field>
@@ -27,13 +30,15 @@
         </field>
     </record>
 
-    <!-- FORM -->
+    <!-- Form view: lifecycle, counters, identity, scores, portal -->
     <record id="view_ojt_participant_form" model="ir.ui.view">
         <field name="name">ojt.participant.form</field>
         <field name="model">ojt.participant</field>
         <field name="arch" type="xml">
             <form string="Participant">
                 <sheet>
+
+                    <!-- Header: state machine and quick transitions -->
                     <header>
                         <field name="state" widget="statusbar" statusbar_visible="draft,active,completed,failed,left"/>
                         <button name="action_set_active" type="object" string="Activate" class="btn-primary" invisible="state != 'draft'"/>
@@ -42,6 +47,26 @@
                         <button name="action_set_left" type="object" string="Mark Left" invisible="state != 'active'"/>
                         <button name="action_set_draft" type="object" string="Reset to Draft" invisible="state != 'failed' and state != 'left' and state != 'completed'"/>
                     </header>
+
+                    <!-- Smart buttons: related counters + portal -->
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="action_open_assignments" icon="fa-tasks">
+                            <field name="submission_count" widget="statinfo" string="Assignments" help="participant assignment list"/>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_open_attendance" icon="fa-check-square">
+                            <field name="attendance_count" widget="statinfo" string="Attendance" help="attendance entries"/>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_open_certificates" icon="fa-certificate">
+                            <field name="certificate_count" widget="statinfo" string="Certificates" help="issued eCertificates"/>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_open_portal" icon="fa-external-link" invisible="not id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Portal</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- Identity and score KPIs -->
                     <group col="2">
                         <group string="Identity">
                             <field name="name" readonly="1"/>
@@ -51,12 +76,14 @@
                             <field name="portal_token"/>
                         </group>
                         <group string="Scores &amp; Attendance">
-                            <field name="attendance_rate"/>
-                            <field name="average_score"/>
-                            <field name="final_score"/>
+                            <field name="attendance_rate" readonly="1"/>
+                            <field name="average_score" readonly="1"/>
+                            <field name="final_score" readonly="1"/>
                             <field name="mentor_score"/>
                         </group>
                     </group>
+
+                    <!-- Notebook: certificates and notes -->
                     <notebook>
                         <page string="Certificates">
                             <field name="certificate_ids">
@@ -85,8 +112,8 @@
                                     </group>
                                     <group col="2">
                                         <group>
-                                            <field name="attendance_rate"/>
-                                            <field name="final_score"/>
+                                            <field name="attendance_rate" readonly="1"/>
+                                            <field name="final_score" readonly="1"/>
                                             <field name="grade"/>
                                         </group>
                                         <group>
@@ -97,12 +124,9 @@
                                         <field name="notes"/>
                                     </group>
                                     <footer>
-                                        <button name="action_issue" string="Issue" type="object"
-                                                class="btn-primary" invisible="state != 'draft'"/>
-                                        <button name="action_revoke" string="Revoke" type="object"
-                                                invisible="state != 'issued'"/>
-                                        <button name="action_reset_draft" string="Reset to Draft" type="object"
-                                                invisible="state == 'draft'"/>
+                                        <button name="action_issue" string="Issue" type="object" class="btn-primary" invisible="state != 'draft'"/>
+                                        <button name="action_revoke" string="Revoke" type="object" invisible="state != 'issued'"/>
+                                        <button name="action_reset_draft" string="Reset to Draft" type="object" invisible="state == 'draft'"/>
                                     </footer>
                                 </form>
                             </field>
@@ -111,8 +135,10 @@
                             <field name="notes"/>
                         </page>
                     </notebook>
+
                 </sheet>
             </form>
         </field>
     </record>
+
 </odoo>

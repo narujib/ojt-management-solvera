@@ -7,6 +7,7 @@
     'license': 'LGPL-3',
     'website': 'https://solvera.id',
     'depends': [
+        'base',
         'hr_recruitment',
         'event',
         'website_slides',
@@ -27,6 +28,7 @@
         'views/ojt_submission_views.xml',
         'views/ojt_attendance_views.xml',
         'views/ojt_certificate_views.xml',
+        'views/portal_ojt_templates.xml',
     ],
     'application': True,
     'installable': True,

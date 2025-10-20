@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Portal: home menu entry -->
+    <template id="portal_my_ojt_home_menu"
+              name="Portal : OJT menu on Home"
+              inherit_id="portal.portal_my_home"
+              priority="90">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <a href="/my/ojt"
+               class="list-group-item list-group-item-action d-flex align-items-center justify-content-between"
+               title="OJT">
+                <span>OJT</span>
+            </a>
+        </xpath>
+    </template>
+
+    <!-- Portal: dashboard (cards + pager) -->
+    <template id="portal_my_ojt_dashboard" name="My OJT">
+        <t t-call="portal.portal_layout">
+            <div class="container mt16 o_my_ojt">
+                <div class="row">
+                    <div class="col-12">
+                        <h3 class="mb16">My OJT</h3>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <t t-if="not participants">
+                        <div class="col-12">
+                            <div class="alert alert-info">No OJT record yet.</div>
+                        </div>
+                    </t>
+                    <t t-foreach="participants" t-as="p">
+                        <div class="col-12 col-md-6 mb16">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <a t-att-href="'/my/ojt/participant/%s' % p.id">
+                                            <t t-esc="p.name"/>
+                                        </a>
+                                    </h5>
+                                    <p class="card-text">
+                                        Batch:
+                                        <strong><t t-esc="p.batch_id.display_name"/></strong>
+                                        <br/>
+                                        Attendance:
+                                        <strong><t t-esc="'%.2f' % p.attendance_rate"/></strong>%
+                                        <span class="mx-1">|</span>
+                                        Final Score:
+                                        <strong><t t-esc="'%.2f' % p.final_score"/></strong>
+                                    </p>
+                                    <a class="btn btn-primary btn-sm" t-att-href="'/my/ojt/participant/%s' % p.id">View details</a>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+
+                <!-- Pager: pass full dict to template -->
+                <t t-if="pager">
+                    <t t-call="portal.pager">
+                        <t t-set="url">/my/ojt</t>
+                        <t t-set="page_count" t-value="pager['page_count']"/>
+                        <t t-set="current_page" t-value="pager['page']"/>
+                        <t t-set="pager" t-value="pager"/>
+                    </t>
+                </t>
+            </div>
+        </t>
+    </template>
+
+    <!-- Portal: participant detail (back link + three blocks) -->
+    <template id="portal_my_ojt_participant_detail" name="OJT Detail">
+        <t t-call="portal.portal_layout">
+            <div class="container mt16 o_my_ojt_detail">
+                <div class="row mb16">
+                    <div class="col-12">
+                        <!-- Back link: use ret if present, fallback to dashboard -->
+                        <a t-att-href="ret or '/my/ojt'" class="btn btn-secondary btn-sm">← Back</a>
+                    </div>
+                </div>
+
+                <div class="row mb8">
+                    <div class="col-12">
+                        <h4><t t-esc="participant.name"/></h4>
+                        <p>
+                            Batch:
+                            <strong><t t-esc="participant.batch_id.display_name"/></strong>
+                            <span class="mx-1">|</span>
+                            Attendance:
+                            <strong><t t-esc="'%.2f' % participant.attendance_rate"/></strong>%
+                            <span class="mx-1">|</span>
+                            Final Score:
+                            <strong><t t-esc="'%.2f' % participant.final_score"/></strong>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Block: assignments/submissions -->
+                    <div class="col-12 col-lg-6 mb16">
+                        <div class="card">
+                            <div class="card-header"><strong>Assignments</strong></div>
+                            <div class="card-body p-0">
+                                <table class="table table-sm mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Title</th>
+                                            <th class="text-end">Score</th>
+                                            <th class="text-end">Created</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-if="not submissions">
+                                            <tr><td colspan="3" class="text-center text-muted py-3">No submissions yet.</td></tr>
+                                        </t>
+                                        <t t-foreach="submissions" t-as="s">
+                                            <tr>
+                                                <td><t t-esc="s.assignment_id.display_name"/></td>
+                                                <td class="text-end"><t t-esc="s.score if s.score is not None else '-'"/></td>
+                                                <td class="text-end"><t t-esc="s.create_date"/></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Block: attendance -->
+                    <div class="col-12 col-lg-6 mb16">
+                        <div class="card">
+                            <div class="card-header"><strong>Attendance</strong></div>
+                            <div class="card-body p-0">
+                                <table class="table table-sm mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Session</th>
+                                            <th class="text-end">Created</th>
+                                            <th class="text-end">Presence</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-if="not attendance">
+                                            <tr><td colspan="3" class="text-center text-muted py-3">No attendance yet.</td></tr>
+                                        </t>
+                                        <t t-foreach="attendance" t-as="a">
+                                            <tr>
+                                                <td><t t-esc="a.event_link_id.title or a.event_link_id.display_name"/></td>
+                                                <td class="text-end"><t t-esc="a.create_date"/></td>
+                                                <td class="text-end"><t t-esc="a.presence"/></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Block: certificates -->
+                    <div class="col-12 mb16">
+                        <div class="card">
+                            <div class="card-header"><strong>Certificates</strong></div>
+                            <div class="card-body p-0">
+                                <table class="table table-sm mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Certificate</th>
+                                            <th>Serial</th>
+                                            <th>Issued On</th>
+                                            <th class="text-end">State</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-set="certs" t-value="certificates"/>
+                                        <t t-if="not certs">
+                                            <tr><td colspan="4" class="text-center text-muted py-3">No certificates.</td></tr>
+                                        </t>
+                                        <t t-foreach="certs" t-as="c">
+                                            <tr>
+                                                <td><t t-esc="c.name"/></td>
+                                                <td><t t-esc="c.serial_number or '-'"/></td>
+                                                <td><t t-esc="c.issued_on or '-'"/></td>
+                                                <td class="text-end"><t t-esc="c.state"/></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </t>
+    </template>
+</odoo>
