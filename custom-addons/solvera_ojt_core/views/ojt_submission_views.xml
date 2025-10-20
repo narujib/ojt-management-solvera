@@ -1,19 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
+    <!-- Menu: Submissions -->
+    <menuitem id="menu_ojt_submission"
+              name="Submissions"
+              parent="menu_ojt_root"
+              action="action_ojt_submission"
+              sequence="26"/>
+
+    <!-- Action: open Submissions -->
     <record id="action_ojt_submission" model="ir.actions.act_window">
         <field name="name">Submissions</field>
         <field name="res_model">ojt.submission</field>
-        <field name="view_mode">list,form</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="search_view_id" ref="view_ojt_submission_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create the first submission</p>
+            <p>Track participant work, lateness, and scores in one place.</p>
+        </field>
     </record>
-    <menuitem id="menu_ojt_submission" name="Submissions" parent="menu_ojt_root" action="action_ojt_submission" sequence="26"/>
 
+    <!-- Search: filters & group-by -->
+    <record id="view_ojt_submission_search" model="ir.ui.view">
+        <field name="name">ojt.submission.search</field>
+        <field name="model">ojt.submission</field>
+        <field name="arch" type="xml">
+            <search string="Search Submissions">
+                <field name="assignment_id"/>
+                <field name="participant_id"/>
+                <filter name="state_draft" string="Draft" domain="[('state','=','draft')]"/>
+                <filter name="state_submitted" string="Submitted" domain="[('state','=','submitted')]"/>
+                <filter name="state_scored" string="Scored" domain="[('state','=','scored')]"/>
+                <filter name="late_only" string="Late Only" domain="[('late','=',True)]"/>
+                <!-- Helper: batch for grouping -->
+                <field name="assignment_batch_id" invisible="1"/>
+                <group expand="0" string="Group By">
+                    <filter name="g_assignment" string="Assignment" context="{'group_by':'assignment_id'}"/>
+                    <filter name="g_participant" string="Participant" context="{'group_by':'participant_id'}"/>
+                    <filter name="g_state" string="State" context="{'group_by':'state'}"/>
+                    <filter name="g_batch" string="Batch" context="{'group_by':'assignment_batch_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- List: compact table -->
     <record id="view_ojt_submission_list" model="ir.ui.view">
         <field name="name">ojt.submission.list</field>
         <field name="model">ojt.submission</field>
         <field name="arch" type="xml">
-            <list string="Submissions">
+            <list string="Submissions" default_order="submitted_on desc">
                 <field name="assignment_id"/>
-                <field name="participant_id" required="1" domain="[('batch_id', '=', assignment_batch_id)]"/>
+                <field name="participant_id" domain="[('batch_id', '=', assignment_batch_id)]"/>
                 <field name="submitted_on"/>
                 <field name="late"/>
                 <field name="score"/>
@@ -23,38 +61,140 @@
         </field>
     </record>
 
+    <!-- Kanban: stage columns -->
+    <record id="view_ojt_submission_kanban" model="ir.ui.view">
+        <field name="name">ojt.submission.kanban</field>
+        <field name="model">ojt.submission</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column">
+                <field name="assignment_id"/>
+                <field name="participant_id"/>
+                <field name="state"/>
+                <field name="submitted_on"/>
+                <field name="late"/>
+                <field name="score"/>
+                <field name="submission_url"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <!-- Vars: state, labels, numbers -->
+                        <t t-set="st"        t-value="(record.state.raw_value || 'draft')"/>
+                        <t t-set="title"     t-value="(record.assignment_id.display_name || record.assignment_id.value || '-')"/>
+                        <t t-set="pname"     t-value="(record.participant_id.display_name || record.participant_id.value || '-')"/>
+                        <t t-set="submit_on" t-value="(record.submitted_on.value || '-')"/>
+                        <t t-set="scr"       t-value="(record.score.value || 0)"/>
+                        <t t-set="surl"      t-value="record.submission_url.value"/>
+
+                        <!-- Card: compact record -->
+                        <div class="oe_kanban_global_click o_kanban_record"
+                             style="background:#fff;border:1px solid #D1D5DB;border-left:4px solid #7C3AED;border-radius:6px;padding:10px;">
+                            <!-- Header: title + status -->
+                            <div style="display:flex;align-items:center;justify-content:space-between;">
+                                <div style="font-weight:700;font-size:14px;line-height:1.3;word-break:break-word;">
+                                    <t t-esc="title"/>
+                                </div>
+                                <span t-if="st === 'draft'"     style="background:#FFF7E6;color:#5C3B00;border:1px solid #F5D08A;padding:2px 6px;border-radius:6px;font-size:10.5px;">Draft</span>
+                                <span t-if="st === 'submitted'" style="background:#EAF2FF;color:#193B7A;border:1px solid #A5C4FF;padding:2px 6px;border-radius:6px;font-size:10.5px;">Submitted</span>
+                                <span t-if="st === 'scored'"    style="background:#E9FBF3;color:#0F5132;border:1px solid #8FE3BE;padding:2px 6px;border-radius:6px;font-size:10.5px;">Scored</span>
+                            </div>
+
+                            <div style="border-top:1px solid #E5E7EB;margin:8px 0;"></div>
+
+                            <!-- Meta: participant and time -->
+                            <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#374151;">
+                                <i class="fa fa-user" style="opacity:.7;"></i>
+                                <span><t t-esc="pname"/></span>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:6px;margin-top:3px;font-size:12px;color:#6B7280;">
+                                <i class="fa fa-clock-o" style="opacity:.7;"></i>
+                                <span>Submitted: <t t-esc="submit_on"/></span>
+                            </div>
+
+                            <!-- Badges: late, score, link -->
+                            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">
+                                <span t-if="record.late.value"
+                                      style="background:#FFECEC;color:#7F1D1D;border:1px solid #F5A5A5;padding:1px 6px;border-radius:6px;font-size:10.5px;">
+                                    Late
+                                </span>
+                                <span style="background:#F3F4F6;color:#374151;border:1px solid #E5E7EB;padding:1px 6px;border-radius:6px;font-size:10.5px;">
+                                    Score: <t t-esc="scr"/>
+                                </span>
+                                <a t-if="surl" t-attf-href="#{surl}" target="_blank"
+                                   style="text-decoration:none;background:#ECFEFF;color:#155E75;border:1px solid #A5F3FC;padding:1px 6px;border-radius:6px;font-size:10.5px;">
+                                    Open Link
+                                </a>
+                            </div>
+
+                            <!-- Quick links: related opens -->
+                            <div style="display:flex;gap:4px;justify-content:center;margin-top:8px;flex-wrap:nowrap;">
+                                <a type="object" name="action_open_assignment" class="oe_kanban_action"
+                                   style="text-decoration:none;border:1px solid #D1D5DB;padding:3px 6px;border-radius:6px;font-size:10px;white-space:nowrap;line-height:1.1;">
+                                    Assignment
+                                </a>
+                                <a type="object" name="action_open_participant" class="oe_kanban_action"
+                                   style="text-decoration:none;border:1px solid #D1D5DB;padding:3px 6px;border-radius:6px;font-size:10px;white-space:nowrap;line-height:1.1;">
+                                    Participant
+                                </a>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Form: statusbar, smart buttons, two columns -->
     <record id="view_ojt_submission_form" model="ir.ui.view">
         <field name="name">ojt.submission.form</field>
         <field name="model">ojt.submission</field>
         <field name="arch" type="xml">
             <form string="Submission">
                 <sheet>
+
+                    <!-- Header: actions + state -->
                     <header>
-                        <field name="state" widget="statusbar" statusbar_visible="draft,submitted,scored"/>
-                        <button name="action_submit" type="object" string="Submit" class="btn-primary" invisible="state != 'draft'"/>
+                        <button name="action_submit" type="object" string="Submit" invisible="state != 'draft'"/>
                         <button name="action_score" type="object" string="Mark Scored" invisible="state != 'submitted'"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,submitted,scored"/>
                     </header>
+
+                    <!-- Smart buttons: quick navigation -->
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="action_open_assignment" icon="fa-tasks">
+                            <div class="o_stat_info"><span class="o_stat_text">Open Assignment</span></div>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_open_participant" icon="fa-user">
+                            <div class="o_stat_info"><span class="o_stat_text">Open Participant</span></div>
+                        </button>
+                    </div>
+
+                    <!-- Body: fields -->
                     <group col="2">
-                        <group>
+                        <group string="SUBMISSION">
                             <field name="assignment_id" required="1"/>
                             <field name="participant_id" required="1" domain="[('batch_id', '=', assignment_batch_id)]"/>
-                            <field name="submitted_on"/>
+                            <field name="submitted_on" readonly="1"/>
                             <field name="late" readonly="1"/>
-                        </group>
-                        <group>
-                            <field name="score"/>
-                            <field name="reviewer_id"/>
                             <field name="submission_url" widget="url"/>
                         </group>
+                        <group string="SCORES &amp; REVIEW">
+                            <field name="score"/>
+                            <field name="reviewer_id"/>
+                        </group>
                     </group>
-                    <group>
-                        <field name="attachment_ids" widget="many2many_binary"/>
-                    </group>
-                    <group>
-                        <field name="feedback"/>
-                    </group>
+
+                    <!-- Tabs: attachments and feedback -->
+                    <notebook>
+                        <page string="Attachments">
+                            <field name="attachment_ids" widget="many2many_binary"/>
+                        </page>
+                        <page string="Feedback">
+                            <field name="feedback"/>
+                        </page>
+                    </notebook>
+
                 </sheet>
             </form>
         </field>
     </record>
+
 </odoo>
