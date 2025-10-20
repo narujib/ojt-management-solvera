@@ -1,6 +1,108 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- LIST view -->
+
+    <!-- Kanban view: batch overview grouped by state -->
+    <record id="view_ojt_batch_kanban" model="ir.ui.view">
+        <field name="name">ojt.batch.kanban</field>
+        <field name="model">ojt.batch</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="state"/>
+                <field name="mode"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="capacity"/>
+                <field name="progress_ratio"/>
+                <field name="participants_count"/>
+                <field name="events_count"/>
+                <field name="assignments_count"/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <!-- Card container -->
+                        <div class="oe_kanban_global_click o_kanban_record"
+                             style="background:#fff;border:1px solid #D1D5DB;border-left:4px solid #7C3AED;border-radius:6px;padding:10px;">
+
+                            <!-- Header: title and state badge -->
+                            <div style="display:flex;align-items:center;justify-content:space-between;">
+                                <div style="font-weight:700;font-size:14px;line-height:1.3;">
+                                    <t t-esc="record.name.value"/>
+                                </div>
+                                <t t-set="st" t-value="record.state.raw_value or 'draft'"/>
+                                <span t-if="st == 'draft'"       style="background:#FFF7E6;color:#5C3B00;border:1px solid #F5D08A;padding:2px 6px;border-radius:6px;font-size:10.5px;">Draft</span>
+                                <span t-if="st == 'recruitment'" style="background:#EAF2FF;color:#193B7A;border:1px solid #A5C4FF;padding:2px 6px;border-radius:6px;font-size:10.5px;">Recruitment</span>
+                                <span t-if="st == 'ongoing'"     style="background:#E9FBF3;color:#0F5132;border:1px solid #8FE3BE;padding:2px 6px;border-radius:6px;font-size:10.5px;">Ongoing</span>
+                                <span t-if="st == 'done'"        style="background:#F5F5F5;color:#374151;border:1px solid #E5E7EB;padding:2px 6px;border-radius:6px;font-size:10.5px;">Done</span>
+                                <span t-if="st == 'cancel'"      style="background:#FFECEC;color:#7F1D1D;border:1px solid #F5A5A5;padding:2px 6px;border-radius:6px;font-size:10.5px;">Cancelled</span>
+                            </div>
+
+                            <div style="border-top:1px solid #E5E7EB;margin:8px 0;"></div>
+
+                            <!-- Meta: dates and code -->
+                            <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#374151;">
+                                <i class="fa fa-calendar" style="opacity:.7;"></i>
+                                <span><t t-esc="record.start_date.value"/> - <t t-esc="record.end_date.value"/></span>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:6px;margin-top:3px;font-size:12px;color:#6B7280;word-break:break-all;">
+                                <i class="fa fa-hashtag" style="opacity:.7;"></i>
+                                <span><t t-esc="record.code.value"/></span>
+                            </div>
+
+                            <!-- Progress: full-width with rounded percentage -->
+                            <t t-set="p" t-value="Math.round(record.progress_ratio.raw_value || 0)"/>
+                            <div style="margin-top:8px;">
+                                <div style="display:flex;justify-content:space-between;font-size:12px;color:#374151;">
+                                    <span>Progress</span>
+                                    <span><t t-esc="p"/>%</span>
+                                </div>
+                                <div style="width:100%;height:6px;background:#E5E7EB;border-radius:6px;overflow:hidden;">
+                                    <div t-attf-style="width: #{p}%; height:100%; background:#6D28D9;"></div>
+                                </div>
+                            </div>
+
+                            <!-- Badges: mode and capacity -->
+                            <div style="display:flex;justify-content:flex-end;gap:6px;margin-top:6px;">
+                                <t t-set="md" t-value="record.mode.raw_value or ''"/>
+                                <span t-if="md == 'online'"  style="background:#ECFEFF;color:#155E75;border:1px solid #A5F3FC;padding:1px 6px;border-radius:6px;font-size:10.5px;">Online</span>
+                                <span t-if="md == 'offline'" style="background:#F0FDF4;color:#14532D;border:1px solid #86EFAC;padding:1px 6px;border-radius:6px;font-size:10.5px;">Offline</span>
+                                <span t-if="md == 'hybrid'"  style="background:#EEF2FF;color:#3730A3;border:1px solid #C7D2FE;padding:1px 6px;border-radius:6px;font-size:10.5px;">Hybrid</span>
+                                <span style="background:#F3F4F6;color:#374151;border:1px solid #E5E7EB;padding:1px 6px;border-radius:6px;font-size:10.5px;">
+                                    Cap: <t t-esc="record.capacity.value or 0"/>
+                                </span>
+                            </div>
+
+                            <!-- Quick links: participants / events / assignments -->
+                            <div style="display:flex;gap:4px;justify-content:center;margin-top:8px;flex-wrap:nowrap;">
+                                <a type="object" name="action_open_participants"
+                                   style="text-decoration:none;border:1px solid #D1D5DB;padding:3px 6px;border-radius:6px;font-size:10px;white-space:nowrap;line-height:1.1;">
+                                    <span style="border:1px solid #D1D5DB;padding:0 4px;border-radius:6px;margin-right:4px;font-size:10px;line-height:1;">
+                                        <t t-esc="record.participants_count.value or 0"/>
+                                    </span>Participants
+                                </a>
+                                <a type="object" name="action_open_event_links"
+                                   style="text-decoration:none;border:1px solid #D1D5DB;padding:3px 6px;border-radius:6px;font-size:10px;white-space:nowrap;line-height:1.1;">
+                                    <span style="border:1px solid #D1D5DB;padding:0 4px;border-radius:6px;margin-right:4px;font-size:10px;line-height:1;">
+                                        <t t-esc="record.events_count.value or 0"/>
+                                    </span>Events
+                                </a>
+                                <a type="object" name="action_open_assignments"
+                                   style="text-decoration:none;border:1px solid #D1D5DB;padding:3px 6px;border-radius:6px;font-size:10px;white-space:nowrap;line-height:1.1;">
+                                    <span style="border:1px solid #D1D5DB;padding:0 4px;border-radius:6px;margin-right:4px;font-size:10px;line-height:1;">
+                                        <t t-esc="record.assignments_count.value or 0"/>
+                                    </span>Assignments
+                                </a>
+                            </div>
+
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- List view: compact batch listing -->
     <record id="view_ojt_batch_list" model="ir.ui.view">
         <field name="name">ojt.batch.list</field>
         <field name="model">ojt.batch</field>
@@ -22,13 +124,14 @@
         </field>
     </record>
 
-    <!-- FORM view -->
+    <!-- Form view: full batch editor with smart buttons -->
     <record id="view_ojt_batch_form" model="ir.ui.view">
         <field name="name">ojt.batch.form</field>
         <field name="model">ojt.batch</field>
         <field name="arch" type="xml">
             <form string="OJT Batch">
                 <sheet>
+                    <!-- Header: state transitions and publish toggle -->
                     <header>
                         <button name="action_set_recruitment" type="object" string="Open Recruitment"
                                 class="btn-secondary" invisible="state != 'draft'"/>
@@ -37,15 +140,46 @@
                         <button name="action_set_done" type="object" string="Mark Done"
                                 class="btn-secondary" invisible="state != 'ongoing'"/>
                         <button name="action_set_cancel" type="object" string="Cancel"
-                                class="btn-danger" invisible="not (state in ['draft', 'ongoing'])"/>
+                                class="btn-danger" invisible="not (state in ['draft','ongoing'])"/>
                         <field name="state" widget="statusbar" statusbar_visible="draft,recruitment,ongoing,done,cancel"/>
                         <field name="is_published" widget="boolean_toggle" nolabel="1" readonly="state != 'recruitment'"/>
                     </header>
 
+                    <!-- Smart buttons: related records counters -->
                     <div class="oe_button_box" name="button_box">
-                        <!-- Smart buttons reserved for future use -->
+                        <button class="oe_stat_button" type="object" name="action_open_participants" icon="fa-users">
+                            <div class="o_stat_info">
+                                <span class="o_stat_value"><field name="participants_count"/></span>
+                                <span class="o_stat_text">Participants</span>
+                            </div>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_open_event_links" icon="fa-calendar">
+                            <div class="o_stat_info">
+                                <span class="o_stat_value"><field name="events_count"/></span>
+                                <span class="o_stat_text">Agenda (Events)</span>
+                            </div>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_open_assignments" icon="fa-tasks">
+                            <div class="o_stat_info">
+                                <span class="o_stat_value"><field name="assignments_count"/></span>
+                                <span class="o_stat_text">Assignments</span>
+                            </div>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_open_attendance" icon="fa-check-square">
+                            <div class="o_stat_info">
+                                <span class="o_stat_value"><field name="attendance_count"/></span>
+                                <span class="o_stat_text">Attendance</span>
+                            </div>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_open_certificates" icon="fa-certificate">
+                            <div class="o_stat_info">
+                                <span class="o_stat_value"><field name="certificates_count"/></span>
+                                <span class="o_stat_text">Certificates</span>
+                            </div>
+                        </button>
                     </div>
 
+                    <!-- Groups: batch identity and schedule -->
                     <group col="2">
                         <group string="Batch">
                             <field name="name"/>
@@ -65,11 +199,14 @@
                         </group>
                     </group>
 
+                    <!-- Notebook: detailed related tabs -->
                     <notebook>
+                        <!-- Tab: rich description -->
                         <page string="Description">
                             <field name="description" placeholder="Short summary, objectives, notes..."/>
                         </page>
 
+                        <!-- Tab: participants inline list/form -->
                         <page string="Participants">
                             <field name="participant_ids">
                                 <list editable="bottom">
@@ -104,6 +241,7 @@
                             </field>
                         </page>
 
+                        <!-- Tab: event links inline list/form -->
                         <page string="Event Links">
                             <field name="event_link_ids">
                                 <list editable="bottom">
@@ -137,10 +275,12 @@
                             </field>
                         </page>
 
+                        <!-- Tab: related courses tags -->
                         <page string="Courses">
                             <field name="course_ids" widget="many2many_tags"/>
                         </page>
-                    
+
+                        <!-- Tab: assignments inline list/form -->
                         <page string="Assignments">
                             <field name="assignment_ids">
                                 <list editable="bottom">
@@ -174,11 +314,12 @@
                             </field>
                         </page>
 
+                        <!-- Tab: attendance inline list/form -->
                         <page string="Attendance">
                             <field name="attendance_ids">
                                 <list editable="bottom">
                                     <field name="event_link_id" domain="[('batch_id', '=', parent.id)]"/>
-                                    <field name="participant_id" domain="[('batch_id', '=', parent.id)]"/>
+                                    <field name="participant_id" domain="[('batch_id', '=', parent.id)]" required="1"/>
                                     <field name="check_in"/>
                                     <field name="check_out"/>
                                     <field name="presence"/>
@@ -189,7 +330,7 @@
                                     <group col="2">
                                         <group>
                                             <field name="event_link_id" domain="[('batch_id', '=', parent.id)]"/>
-                                            <field name="participant_id" required="1" domain="[('batch_id', '=', parent.id)]"/>
+                                            <field name="participant_id" domain="[('batch_id', '=', parent.id)]" required="1"/>
                                             <field name="presence"/>
                                             <field name="method"/>
                                         </group>
@@ -210,4 +351,25 @@
             </form>
         </field>
     </record>
+
+    <!-- Search view: quick filters for state and mode -->
+    <record id="view_ojt_batch_search" model="ir.ui.view">
+        <field name="name">ojt.batch.search</field>
+        <field name="model">ojt.batch</field>
+        <field name="arch" type="xml">
+            <search string="Search Batches">
+                <field name="name"/>
+                <field name="code"/>
+                <filter string="Recruitment" name="state_recruitment" domain="[('state','=','recruitment')]"/>
+                <filter string="Ongoing" name="state_ongoing" domain="[('state','=','ongoing')]"/>
+                <filter string="Done" name="state_done" domain="[('state','=','done')]"/>
+                <filter string="Cancelled" name="state_cancel" domain="[('state','=','cancel')]"/>
+                <separator/>
+                <filter string="Online" name="mode_online" domain="[('mode','=','online')]"/>
+                <filter string="Offline" name="mode_offline" domain="[('mode','=','offline')]"/>
+                <filter string="Hybrid" name="mode_hybrid" domain="[('mode','=','hybrid')]"/>
+            </search>
+        </field>
+    </record>
+
 </odoo>
