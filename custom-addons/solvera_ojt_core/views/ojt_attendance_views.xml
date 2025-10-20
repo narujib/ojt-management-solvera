@@ -1,20 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Action & Menu -->
-    <record id="action_ojt_attendance" model="ir.actions.act_window">
-        <field name="name">Attendance</field>
-        <field name="res_model">ojt.attendance</field>
-        <field name="view_mode">list,form</field>
-    </record>
-    <menuitem id="menu_ojt_attendance" name="Attendance"
-              parent="menu_ojt_root" action="action_ojt_attendance" sequence="35"/>
 
-    <!-- List -->
+    <!-- Menu: Attendance under OJT root -->
+    <menuitem id="menu_ojt_attendance" name="Attendance" parent="menu_ojt_root" action="action_ojt_attendance" sequence="35"/>
+
+    <!-- Search: filters & group-by (placed first for action reference) -->
+    <record id="view_ojt_attendance_search" model="ir.ui.view">
+        <field name="name">ojt.attendance.search</field>
+        <field name="model">ojt.attendance</field>
+        <field name="arch" type="xml">
+            <search string="Search Attendance">
+                <field name="batch_id"/>
+                <field name="event_link_id"/>
+                <field name="participant_id"/>
+
+                <filter name="p_present" string="Present" domain="[('presence','=','present')]"/>
+                <filter name="p_late"    string="Late"    domain="[('presence','=','late')]"/>
+                <filter name="p_absent"  string="Absent"  domain="[('presence','=','absent')]"/>
+
+                <filter name="m_qr"     string="QR"     domain="[('method','=','qr')]"/>
+                <filter name="m_online" string="Online" domain="[('method','=','online')]"/>
+                <filter name="m_manual" string="Manual" domain="[('method','=','manual')]"/>
+
+                <filter name="today" string="Today"
+                        domain="[('check_in','&gt;=', context_today().strftime('%%Y-%%m-%%d 00:00:00')),
+                                 ('check_in','&lt;=', context_today().strftime('%%Y-%%m-%%d 23:59:59'))]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="g_batch"       string="Batch"       context="{'group_by':'batch_id'}"/>
+                    <filter name="g_event"       string="Event"       context="{'group_by':'event_link_id'}"/>
+                    <filter name="g_participant" string="Participant" context="{'group_by':'participant_id'}"/>
+                    <filter name="g_presence"    string="Presence"    context="{'group_by':'presence'}"/>
+                    <filter name="g_method"      string="Method"      context="{'group_by':'method'}"/>
+                    <filter name="g_day"         string="Day"         context="{'group_by':'check_in:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- List: tabular attendance view -->
     <record id="view_ojt_attendance_list" model="ir.ui.view">
         <field name="name">ojt.attendance.list</field>
         <field name="model">ojt.attendance</field>
         <field name="arch" type="xml">
-            <list string="Attendance">
+            <list string="Attendance" default_order="check_in desc">
                 <field name="batch_id"/>
                 <field name="event_link_id"/>
                 <field name="participant_id"/>
@@ -23,11 +52,39 @@
                 <field name="presence"/>
                 <field name="method"/>
                 <field name="duration_minutes"/>
+                <field name="attendance_percent"/>
             </list>
         </field>
     </record>
 
-    <!-- Form -->
+    <!-- Pivot: aggregate analytics (avg% and duration) -->
+    <record id="view_ojt_attendance_pivot" model="ir.ui.view">
+        <field name="name">ojt.attendance.pivot</field>
+        <field name="model">ojt.attendance</field>
+        <field name="arch" type="xml">
+            <pivot string="Attendance Analytics" disable_linking="true">
+                <field name="attendance_percent" type="measure"/>
+                <field name="duration_minutes"   type="measure"/>
+                <field name="batch_id"           type="row"/>
+                <field name="event_link_id"      type="row"/>
+                <field name="participant_id"     type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph: session-level attendance percentage -->
+    <record id="view_ojt_attendance_graph" model="ir.ui.view">
+        <field name="name">ojt.attendance.graph</field>
+        <field name="model">ojt.attendance</field>
+        <field name="arch" type="xml">
+            <graph string="Attendance % per Session" type="bar">
+                <field name="attendance_percent" type="measure"/>
+                <field name="event_link_id"      type="row"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Form: two-column entry with computed fields -->
     <record id="view_ojt_attendance_form" model="ir.ui.view">
         <field name="name">ojt.attendance.form</field>
         <field name="model">ojt.attendance</field>
@@ -46,6 +103,7 @@
                             <field name="check_in"/>
                             <field name="check_out"/>
                             <field name="duration_minutes" readonly="1"/>
+                            <field name="attendance_percent" readonly="1"/>
                         </group>
                     </group>
                     <group>
@@ -55,4 +113,17 @@
             </form>
         </field>
     </record>
+
+    <!-- Action: open Attendance (list/pivot/graph/form) -->
+    <record id="action_ojt_attendance" model="ir.actions.act_window">
+        <field name="name">Attendance</field>
+        <field name="res_model">ojt.attendance</field>
+        <field name="view_mode">list,pivot,graph,form</field>
+        <field name="search_view_id" ref="view_ojt_attendance_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create the first attendance</p>
+            <p>Analyze by batch, event, and participant with Pivot &amp; Graph.</p>
+        </field>
+    </record>
+
 </odoo>
