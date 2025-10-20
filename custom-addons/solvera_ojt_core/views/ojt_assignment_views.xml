@@ -1,12 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Action: open Assignments (kanban/list/form) -->
     <record id="action_ojt_assignment" model="ir.actions.act_window">
         <field name="name">Assignments</field>
         <field name="res_model">ojt.assignment</field>
-        <field name="view_mode">list,form</field>
+        <field name="view_mode">kanban,list,form</field>
     </record>
+
+    <!-- Menu: Assignments under OJT root -->
     <menuitem id="menu_ojt_assignment" name="Assignments" parent="menu_ojt_root" action="action_ojt_assignment" sequence="25"/>
 
+    <!-- Kanban: compact cards grouped by state -->
+    <record id="view_ojt_assignment_kanban" model="ir.ui.view">
+        <field name="name">ojt.assignment.kanban</field>
+        <field name="model">ojt.assignment</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="batch_id"/>
+                <field name="event_link_id"/>
+                <field name="type"/>
+                <field name="deadline"/>
+                <field name="max_score"/>
+                <field name="weight"/>
+                <field name="state"/>
+                <field name="submit_count"/>
+                <field name="participant_count"/>
+                <field name="avg_score"/>
+                <field name="submission_progress"/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <!-- Card -->
+                        <div class="oe_kanban_global_click o_kanban_record"
+                             style="background:#fff;border:1px solid #D1D5DB;border-left:4px solid #7C3AED;border-radius:6px;padding:10px;">
+
+                            <!-- Title + state -->
+                            <div style="display:flex;align-items:center;justify-content:space-between;">
+                                <div style="font-weight:700;font-size:14px;line-height:1.3;">
+                                    <t t-esc="record.name.value"/>
+                                </div>
+                                <t t-set="st" t-value="record.state.raw_value or 'draft'"/>
+                                <span t-if="st == 'draft'"  style="background:#FFF7E6;color:#5C3B00;border:1px solid #F5D08A;padding:2px 6px;border-radius:6px;font-size:10.5px;">Draft</span>
+                                <span t-if="st == 'open'"   style="background:#E9FBF3;color:#0F5132;border:1px solid #8FE3BE;padding:2px 6px;border-radius:6px;font-size:10.5px;">Open</span>
+                                <span t-if="st == 'closed'" style="background:#F5F5F5;color:#374151;border:1px solid #E5E7EB;padding:2px 6px;border-radius:6px;font-size:10.5px;">Closed</span>
+                            </div>
+
+                            <!-- Meta -->
+                            <div style="border-top:1px solid #E5E7EB;margin:8px 0;"></div>
+                            <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#374151;">
+                                <i class="fa fa-users" style="opacity:.7;"></i>
+                                <span><t t-esc="record.batch_id.value"/></span>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:6px;margin-top:3px;font-size:12px;color:#6B7280;">
+                                <i class="fa fa-calendar-o" style="opacity:.7;"></i>
+                                <span><t t-esc="record.deadline.value or '-'"/></span>
+                            </div>
+
+                            <!-- Progress -->
+                            <div style="margin-top:8px;">
+                                <t t-set="p" t-value="Math.round(record.submission_progress.raw_value || 0)"/>
+                                <div style="display:flex;justify-content:space-between;font-size:12px;color:#374151;">
+                                    <span>Submission Progress</span>
+                                    <span>
+                                        <t t-esc="p"/>%
+                                        (<t t-esc="record.submit_count.value or 0"/>/<t t-esc="record.participant_count.value or 0"/>)
+                                    </span>
+                                </div>
+                                <div style="width:100%;height:6px;background:#E5E7EB;border-radius:6px;overflow:hidden;">
+                                    <div t-attf-style="width: #{p}%; height:100%; background:#6D28D9;"></div>
+                                </div>
+                            </div>
+
+                            <!-- Badges -->
+                            <div style="display:flex;justify-content:center;gap:6px;margin-top:6px;">
+                                <t t-set="tp" t-value="record.type.raw_value or ''"/>
+                                <span t-if="tp == 'task'"         style="background:#ECFEFF;color:#155E75;border:1px solid #A5F3FC;padding:1px 6px;border-radius:6px;font-size:10.5px;">Task</span>
+                                <span t-if="tp == 'quiz'"         style="background:#F0FDF4;color:#14532D;border:1px solid #86EFAC;padding:1px 6px;border-radius:6px;font-size:10.5px;">Quiz</span>
+                                <span t-if="tp == 'presentation'" style="background:#EEF2FF;color:#3730A3;border:1px solid #C7D2FE;padding:1px 6px;border-radius:6px;font-size:10.5px;">Presentation</span>
+                                <span style="background:#F3F4F6;color:#374151;border:1px solid #E5E7EB;padding:1px 6px;border-radius:6px;font-size:10.5px;">
+                                    W: <t t-esc="record.weight.value or 0"/>
+                                </span>
+                                <span style="background:#F3F4F6;color:#374151;border:1px solid #E5E7EB;padding:1px 6px;border-radius:6px;font-size:10.5px;">
+                                    Max: <t t-esc="record.max_score.value or 0"/>
+                                </span>
+                                <span style="background:#FFF7E6;color:#5C3B00;border:1px solid #F5D08A;padding:1px 6px;border-radius:6px;font-size:10.5px;">
+                                    Avg: <t t-esc="record.avg_score.value or 0"/>%
+                                </span>
+                            </div>
+
+                            <!-- Quick link -->
+                            <div style="display:flex;gap:4px;justify-content:center;margin-top:8px;flex-wrap:nowrap;">
+                                <a type="object" name="action_open_score_overview"
+                                   style="text-decoration:none;border:1px solid #D1D5DB;padding:3px 6px;border-radius:6px;font-size:10px;white-space:nowrap;line-height:1.1;">
+                                    Score Overview
+                                </a>
+                            </div>
+
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- List: quick management table -->
     <record id="view_ojt_assignment_list" model="ir.ui.view">
         <field name="name">ojt.assignment.list</field>
         <field name="model">ojt.assignment</field>
@@ -19,27 +117,46 @@
                 <field name="deadline"/>
                 <field name="max_score"/>
                 <field name="weight"/>
+                <field name="avg_score"/>
+                <field name="submission_progress"/>
                 <field name="state"/>
                 <field name="submit_count"/>
+                <field name="participant_count"/>
             </list>
         </field>
     </record>
 
+    <!-- Form: lifecycle + KPIs + submissions -->
     <record id="view_ojt_assignment_form" model="ir.ui.view">
         <field name="name">ojt.assignment.form</field>
         <field name="model">ojt.assignment</field>
         <field name="arch" type="xml">
             <form string="Assignment">
                 <sheet>
+                    <!-- Status + actions -->
                     <header>
-                            <button class="oe_stat_button" type="object" name="action_open_submissions">
-                                <field name="submit_count" widget="statinfo" string="Submissions"/>
-                            </button>
                         <field name="state" widget="statusbar" statusbar_visible="draft,open,closed"/>
                         <button name="action_open" type="object" string="Open" class="btn-primary" invisible="state != 'draft'"/>
                         <button name="action_close" type="object" string="Close" invisible="state != 'open'"/>
                         <button name="action_reset_draft" type="object" string="Reset to Draft" invisible="state != 'closed'"/>
                     </header>
+
+                    <!-- Smart buttons -->
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="action_open_submissions" icon="fa-inbox">
+                            <field name="submit_count" widget="statinfo" string="Submissions"/>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_open_participants" icon="fa-users">
+                            <field name="participant_count" widget="statinfo" string="Participants"/>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_open_score_overview" icon="fa-bar-chart">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Score Overview</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- Main fields -->
                     <group col="2">
                         <group>
                             <field name="name"/>
@@ -54,10 +171,21 @@
                             <field name="attachment_required"/>
                         </group>
                     </group>
+
+                    <!-- KPIs -->
+                    <group string="Statistics">
+                        <field name="submission_progress" readonly="1" widget="progressbar"/>
+                        <group>
+                            <field name="avg_score" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <!-- Tabs -->
                     <notebook>
                         <page string="Description">
                             <field name="description"/>
                         </page>
+
                         <page string="Submissions">
                             <field name="submission_ids">
                                 <list editable="bottom">
@@ -98,6 +226,31 @@
                     </notebook>
                 </sheet>
             </form>
+        </field>
+    </record>
+
+    <!-- Graph: score per participant -->
+    <record id="view_ojt_submission_graph_for_assignment" model="ir.ui.view">
+        <field name="name">ojt.submission.graph.assignment</field>
+        <field name="model">ojt.submission</field>
+        <field name="arch" type="xml">
+            <graph string="Submission Scores" type="bar">
+                <field name="score" type="measure"/>
+                <field name="participant_id" type="row"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Pivot: score aggregation -->
+    <record id="view_ojt_submission_pivot_for_assignment" model="ir.ui.view">
+        <field name="name">ojt.submission.pivot.assignment</field>
+        <field name="model">ojt.submission</field>
+        <field name="arch" type="xml">
+            <pivot string="Scores Pivot">
+                <field name="score" type="measure"/>
+                <field name="participant_id" type="row"/>
+                <field name="assignment_id" invisible="1"/>
+            </pivot>
         </field>
     </record>
 </odoo>
