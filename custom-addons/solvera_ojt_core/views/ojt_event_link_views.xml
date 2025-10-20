@@ -1,16 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Standalone list/form for Event Links -->
+
+    <!-- Action: open Event Links with calendar/list/form -->
     <record id="action_ojt_event_link" model="ir.actions.act_window">
         <field name="name">Event Links</field>
         <field name="res_model">ojt.event.link</field>
-        <field name="view_mode">list,form</field>
+        <field name="view_mode">calendar,list,form</field>
+        <!-- Empty-state help -->
         <field name="help" type="html">
             <p>Manage agenda/sessions linked to OJT batches.</p>
         </field>
+        <field name="context">{}</field>
     </record>
+
+    <!-- Menu: Events under OJT root -->
     <menuitem id="menu_ojt_event_link" name="Event Links" parent="menu_ojt_root" action="action_ojt_event_link" sequence="20"/>
 
+    <!-- List view: compact listing of event links -->
     <record id="view_ojt_event_link_list" model="ir.ui.view">
         <field name="name">ojt.event.link.list</field>
         <field name="model">ojt.event.link</field>
@@ -28,12 +34,27 @@
         </field>
     </record>
 
+    <!-- Form view: editor with smart counters -->
     <record id="view_ojt_event_link_form" model="ir.ui.view">
         <field name="name">ojt.event.link.form</field>
         <field name="model">ojt.event.link</field>
         <field name="arch" type="xml">
             <form string="Event Link">
                 <sheet>
+                    <!-- Smart buttons: related records counters -->
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="action_open_participants" icon="fa-users">
+                            <field name="participants_count" widget="statinfo" string="Participants"/>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_open_attendance" icon="fa-check-square">
+                            <field name="attendance_count" widget="statinfo" string="Attendance"/>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_open_assignments" icon="fa-tasks">
+                            <field name="assignments_count" widget="statinfo" string="Assignments"/>
+                        </button>
+                    </div>
+
+                    <!-- Groups: identity and schedule -->
                     <group col="2">
                         <group>
                             <field name="batch_id"/>
@@ -49,6 +70,8 @@
                             <field name="online_meeting_url" widget="url"/>
                         </group>
                     </group>
+
+                    <!-- Notes: technical details -->
                     <group>
                         <field name="notes" placeholder="Technical notes, room/URL details, etc."/>
                     </group>
@@ -56,4 +79,19 @@
             </form>
         </field>
     </record>
+
+    <!-- Calendar view: time-based agenda by instructor color -->
+    <record id="view_ojt_event_link_calendar" model="ir.ui.view">
+        <field name="name">ojt.event.link.calendar</field>
+        <field name="model">ojt.event.link</field>
+        <field name="arch" type="xml">
+            <calendar string="Event Calendar" date_start="date_start" date_stop="date_end" color="instructor_id">
+                <field name="title"/>
+                <field name="batch_id"/>
+                <field name="instructor_id"/>
+                <field name="mandatory"/>
+            </calendar>
+        </field>
+    </record>
+
 </odoo>
