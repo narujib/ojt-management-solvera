@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Settings: add OJT app and attendance automation options -->
+    <record id="res_config_settings_view_form_ojt" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.ojt</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="priority" eval="15"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/app[last()]" position="after">
+                <app string="OJT" name="ojt">
+                    <block title="Attendance Automation">
+                        <setting string="Late grace (minutes)"
+                                 help="Max minutes from start still counted as Present.">
+                            <field name="ojt_late_grace_minutes"/>
+                        </setting>
+
+                        <setting string="Auto Absent after (minutes)"
+                                 help="If not checked in by this threshold, mark as Absent.">
+                            <field name="ojt_auto_absent_after_minutes"/>
+                        </setting>
+
+                        <setting string="Auto Checkout buffer (minutes)"
+                                 help="Auto checkout at event end plus this buffer.">
+                            <field name="ojt_auto_checkout_buffer_minutes"/>
+                        </setting>
+
+                        <!-- Window open/close -->
+                        <setting string="Early check-in open (minutes)"
+                                 help="Allow check-in this many minutes before session starts.">
+                            <field name="ojt_early_checkin_open_minutes"/>
+                        </setting>
+
+                        <setting string="Close check-in after end (minutes)"
+                                 help="Keep check-in open this many minutes after session ends.">
+                            <field name="ojt_close_checkin_after_end_minutes"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -8,3 +8,5 @@ from . import ojt_assignment
 from . import ojt_submission
 from . import ojt_attendance
 from . import hr_applicant_inherit
+from . import res_config_settings
+from . import ojt_participant_auto

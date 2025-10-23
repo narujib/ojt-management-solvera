@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Cron: periodically mark missing check-ins as Absent -->
+    <record id="ir_cron_ojt_auto_absent" model="ir.cron">
+        <field name="name">OJT: Auto Mark Absent</field>
+        <field name="model_id" ref="model_ojt_attendance"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_mark_absent()</field>
+        <field name="interval_number">5</field>
+        <field name="interval_type">minutes</field>
+        <field name="user_id" ref="base.user_root"/>
+        <field name="active">True</field>
+    </record>
+
+    <!-- Cron: auto-checkout lingering sessions -->
+    <record id="ir_cron_ojt_auto_checkout" model="ir.cron">
+        <field name="name">OJT: Auto Checkout</field>
+        <field name="model_id" ref="model_ojt_attendance"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_auto_checkout()</field>
+        <field name="interval_number">5</field>
+        <field name="interval_type">minutes</field>
+        <field name="user_id" ref="base.user_root"/>
+        <field name="active">True</field>
+    </record>
+
+</odoo>

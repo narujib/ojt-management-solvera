@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Portal: home menu entry -->
+
+    <!-- Portal: add OJT entry on home -->
     <template id="portal_my_ojt_home_menu"
               name="Portal : OJT menu on Home"
               inherit_id="portal.portal_my_home"
@@ -75,7 +76,7 @@
             <div class="container mt16 o_my_ojt_detail">
                 <div class="row mb16">
                     <div class="col-12">
-                        <!-- Back link: use ret if present, fallback to dashboard -->
+                        <!-- Back: use ret if present -->
                         <a t-att-href="ret or '/my/ojt'" class="btn btn-secondary btn-sm">← Back</a>
                     </div>
                 </div>
@@ -112,7 +113,9 @@
                                     </thead>
                                     <tbody>
                                         <t t-if="not submissions">
-                                            <tr><td colspan="3" class="text-center text-muted py-3">No submissions yet.</td></tr>
+                                            <tr>
+                                                <td colspan="3" class="text-center text-muted py-3">No submissions yet.</td>
+                                            </tr>
                                         </t>
                                         <t t-foreach="submissions" t-as="s">
                                             <tr>
@@ -142,7 +145,9 @@
                                     </thead>
                                     <tbody>
                                         <t t-if="not attendance">
-                                            <tr><td colspan="3" class="text-center text-muted py-3">No attendance yet.</td></tr>
+                                            <tr>
+                                                <td colspan="3" class="text-center text-muted py-3">No attendance yet.</td>
+                                            </tr>
                                         </t>
                                         <t t-foreach="attendance" t-as="a">
                                             <tr>
@@ -174,7 +179,9 @@
                                     <tbody>
                                         <t t-set="certs" t-value="certificates"/>
                                         <t t-if="not certs">
-                                            <tr><td colspan="4" class="text-center text-muted py-3">No certificates.</td></tr>
+                                            <tr>
+                                                <td colspan="4" class="text-center text-muted py-3">No certificates.</td>
+                                            </tr>
                                         </t>
                                         <t t-foreach="certs" t-as="c">
                                             <tr>
@@ -194,4 +201,52 @@
             </div>
         </t>
     </template>
+
+    <!-- Portal: add Join action column on Attendance -->
+    <template id="portal_my_ojt_participant_detail_join_action"
+              inherit_id="solvera_ojt_core.portal_my_ojt_participant_detail">
+        <!-- Column header: Action -->
+        <xpath expr="//div[contains(@class,'card-header')][contains(normalize-space(),'Attendance')]/following-sibling::div//thead/tr"
+               position="inside">
+            <th class="text-end">Action</th>
+        </xpath>
+
+        <!-- Row cell: Join button or dash -->
+        <xpath expr="//div[contains(@class,'card-header')][contains(normalize-space(),'Attendance')]/following-sibling::div//tbody//tr"
+               position="inside">
+            <td class="text-end">
+                <t t-if="a.event_link_id and a.event_link_id.online_meeting_url and a.qr_token">
+                    <a t-att-href="a.join_url" class="btn btn-primary btn-sm">Join Online</a>
+                </t>
+                <t t-else="">
+                    <span class="text-muted">-</span>
+                </t>
+            </td>
+        </xpath>
+    </template>
+
+    <!-- Page: QR success -->
+    <template id="portal_ojt_qr_success" name="OJT QR Success">
+        <t t-call="portal.portal_layout">
+            <div class="container mt16">
+                <div class="alert alert-success">
+                    <strong><t t-esc="message or 'Check-in recorded.'"/></strong>
+                </div>
+                <a href="/my/ojt" class="btn btn-secondary btn-sm">Back to My OJT</a>
+            </div>
+        </t>
+    </template>
+
+    <!-- Page: join info when meeting link is missing -->
+    <template id="portal_ojt_join_info" name="OJT Join Info">
+        <t t-call="portal.portal_layout">
+            <div class="container mt16">
+                <div class="alert alert-warning">
+                    <strong>Meeting link is not available.</strong>
+                </div>
+                <a href="/my/ojt" class="btn btn-secondary btn-sm">Back to My OJT</a>
+            </div>
+        </t>
+    </template>
+
 </odoo>

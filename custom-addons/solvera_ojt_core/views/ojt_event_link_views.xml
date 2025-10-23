@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- List view: compact listing of event links -->
+    <!-- List: quick overview of event links -->
     <record id="view_ojt_event_link_list" model="ir.ui.view">
         <field name="name">ojt.event.link.list</field>
         <field name="model">ojt.event.link</field>
@@ -19,14 +19,21 @@
         </field>
     </record>
 
-    <!-- Form view: editor with smart counters -->
+    <!-- Form: details, stats, and sync button -->
     <record id="view_ojt_event_link_form" model="ir.ui.view">
         <field name="name">ojt.event.link.form</field>
         <field name="model">ojt.event.link</field>
         <field name="arch" type="xml">
             <form string="Event Link">
+                <header>
+                    <button name="action_generate_attendance"
+                            type="object"
+                            string="Sync Attendance"
+                            help="Ensure all batch participants have an attendance row for this session. Safe to click anytime; no duplicates."/>
+                </header>
+
                 <sheet>
-                    <!-- Smart buttons: related records counters -->
+                    <!-- Smart buttons: related counts -->
                     <div class="oe_button_box" name="button_box">
                         <button class="oe_stat_button" type="object" name="action_open_participants" icon="fa-users">
                             <field name="participants_count" widget="statinfo" string="Participants"/>
@@ -39,7 +46,7 @@
                         </button>
                     </div>
 
-                    <!-- Groups: identity and schedule -->
+                    <!-- Two-column: core fields and schedule -->
                     <group col="2">
                         <group>
                             <field name="batch_id"/>
@@ -56,7 +63,7 @@
                         </group>
                     </group>
 
-                    <!-- Notes: technical details -->
+                    <!-- Notes: free-form details -->
                     <group>
                         <field name="notes" placeholder="Technical notes, room/URL details, etc."/>
                     </group>
@@ -65,7 +72,7 @@
         </field>
     </record>
 
-    <!-- Calendar view: time-based agenda by instructor color -->
+    <!-- Calendar: visualize sessions by date/time -->
     <record id="view_ojt_event_link_calendar" model="ir.ui.view">
         <field name="name">ojt.event.link.calendar</field>
         <field name="model">ojt.event.link</field>
