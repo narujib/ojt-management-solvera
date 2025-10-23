@@ -1,27 +1,121 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <!-- Action: open Batch records with kanban/list/form -->
+    <!-- Root: OJT application menu -->
+    <menuitem id="menu_ojt_root" name="OJT Management" sequence="10"/>
+
+    <!-- Batches: action + menu -->
     <record id="action_ojt_batch" model="ir.actions.act_window">
         <field name="name">Batches</field>
         <field name="res_model">ojt.batch</field>
-        <field name="view_mode">kanban,list,form</field>
-        <!-- Empty-state help -->
+        <field name="view_mode">list,form</field>
         <field name="help" type="html">
-            <p>Create and manage OJT batches here.</p>
+            <p class="o_view_nocontent_smiling_face">Create your first Batch</p>
+            <p>Manage OJT batches, schedules, and cohort-level settings.</p>
         </field>
     </record>
+    <menuitem id="menu_ojt_batch"
+              name="Batches"
+              parent="menu_ojt_root"
+              action="solvera_ojt_core.action_ojt_batch"
+              sequence="10"/>
 
-    <!-- Root menu: top-level entry for OJT -->
-    <menuitem id="menu_ojt_root" name="OJT Management" sequence="10"/>
+    <!-- Participants: action + menu -->
+    <record id="action_ojt_participant" model="ir.actions.act_window">
+        <field name="name">Participants</field>
+        <field name="res_model">ojt.participant</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add your first Participant</p>
+            <p>Track trainees enrolled in batches, their scores, attendance rate, and status.</p>
+        </field>
+    </record>
+    <menuitem id="menu_ojt_participant"
+              name="Participants"
+              parent="menu_ojt_root"
+              action="solvera_ojt_core.action_ojt_participant"
+              sequence="20"/>
 
-    <!-- Child menu: opens Batch action under root -->
-    <menuitem
-        id="menu_ojt_batch"
-        name="Batches"
-        parent="menu_ojt_root"
-        action="action_ojt_batch"
-        sequence="10"
-    />
+    <!-- Event Links: action + menu -->
+    <record id="action_ojt_event_link" model="ir.actions.act_window">
+        <field name="name">Event Links</field>
+        <field name="res_model">ojt.event.link</field>
+        <field name="view_mode">list,calendar,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first Event Link</p>
+            <p>Link Odoo Events/Sessions to OJT batches for attendance and scheduling.</p>
+        </field>
+    </record>
+    <menuitem id="menu_ojt_event_link"
+              name="Event Links"
+              parent="menu_ojt_root"
+              action="solvera_ojt_core.action_ojt_event_link"
+              sequence="30"/>
+
+    <!-- Attendance: action + menu -->
+    <record id="action_ojt_attendance" model="ir.actions.act_window">
+        <field name="name">Attendance</field>
+        <field name="res_model">ojt.attendance</field>
+        <field name="view_mode">list,pivot,graph,form</field>
+        <field name="search_view_id" ref="view_ojt_attendance_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Record your first Attendance</p>
+            <p>Record and analyze session attendance across batches and events.</p>
+        </field>
+    </record>
+    <menuitem id="menu_ojt_attendance"
+              name="Attendance"
+              parent="menu_ojt_root"
+              action="solvera_ojt_core.action_ojt_attendance"
+              sequence="40"/>
+
+    <!-- Assignments: action + menu -->
+    <record id="action_ojt_assignment" model="ir.actions.act_window">
+        <field name="name">Assignments</field>
+        <field name="res_model">ojt.assignment</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Define your first Assignment</p>
+            <p>Create and manage tasks and grading rubrics for training sessions.</p>
+        </field>
+    </record>
+    <menuitem id="menu_ojt_assignment"
+              name="Assignments"
+              parent="menu_ojt_root"
+              action="solvera_ojt_core.action_ojt_assignment"
+              sequence="50"/>
+
+    <!-- Submissions: action + menu -->
+    <record id="action_ojt_submission" model="ir.actions.act_window">
+        <field name="name">Submissions</field>
+        <field name="res_model">ojt.submission</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="search_view_id" ref="view_ojt_submission_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Wait for your first Submission</p>
+            <p>Review trainee submissions and record grades and feedback.</p>
+        </field>
+    </record>
+    <menuitem id="menu_ojt_submission"
+              name="Submissions"
+              parent="menu_ojt_root"
+              action="solvera_ojt_core.action_ojt_submission"
+              sequence="60"/>
+
+    <!-- Certificates: action + menu -->
+    <record id="action_ojt_certificate" model="ir.actions.act_window">
+        <field name="name">Certificates</field>
+        <field name="res_model">ojt.certificate</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Issue your first Certificate</p>
+            <p>Issue and manage training certificates based on batch rules and final scores.</p>
+        </field>
+    </record>
+    <menuitem id="menu_ojt_certificate"
+              name="Certificates"
+              parent="menu_ojt_root"
+              action="solvera_ojt_core.action_ojt_certificate"
+              sequence="70"/>
 
 </odoo>

@@ -1,25 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Menu: Submissions -->
-    <menuitem id="menu_ojt_submission"
-              name="Submissions"
-              parent="menu_ojt_root"
-              action="action_ojt_submission"
-              sequence="26"/>
-
-    <!-- Action: open Submissions -->
-    <record id="action_ojt_submission" model="ir.actions.act_window">
-        <field name="name">Submissions</field>
-        <field name="res_model">ojt.submission</field>
-        <field name="view_mode">list,kanban,form</field>
-        <field name="search_view_id" ref="view_ojt_submission_search"/>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">Create the first submission</p>
-            <p>Track participant work, lateness, and scores in one place.</p>
-        </field>
-    </record>
-
     <!-- Search: filters & group-by -->
     <record id="view_ojt_submission_search" model="ir.ui.view">
         <field name="name">ojt.submission.search</field>

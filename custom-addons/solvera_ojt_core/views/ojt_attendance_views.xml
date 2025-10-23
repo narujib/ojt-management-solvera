@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Menu: Attendance under OJT root -->
-    <menuitem id="menu_ojt_attendance" name="Attendance" parent="menu_ojt_root" action="action_ojt_attendance" sequence="35"/>
-
     <!-- Search: filters & group-by (placed first for action reference) -->
     <record id="view_ojt_attendance_search" model="ir.ui.view">
         <field name="name">ojt.attendance.search</field>
@@ -111,18 +108,6 @@
                     </group>
                 </sheet>
             </form>
-        </field>
-    </record>
-
-    <!-- Action: open Attendance (list/pivot/graph/form) -->
-    <record id="action_ojt_attendance" model="ir.actions.act_window">
-        <field name="name">Attendance</field>
-        <field name="res_model">ojt.attendance</field>
-        <field name="view_mode">list,pivot,graph,form</field>
-        <field name="search_view_id" ref="view_ojt_attendance_search"/>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">Create the first attendance</p>
-            <p>Analyze by batch, event, and participant with Pivot &amp; Graph.</p>
         </field>
     </record>
 

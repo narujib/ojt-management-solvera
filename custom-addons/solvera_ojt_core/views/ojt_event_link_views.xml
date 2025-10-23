@@ -1,21 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Action: open Event Links with calendar/list/form -->
-    <record id="action_ojt_event_link" model="ir.actions.act_window">
-        <field name="name">Event Links</field>
-        <field name="res_model">ojt.event.link</field>
-        <field name="view_mode">calendar,list,form</field>
-        <!-- Empty-state help -->
-        <field name="help" type="html">
-            <p>Manage agenda/sessions linked to OJT batches.</p>
-        </field>
-        <field name="context">{}</field>
-    </record>
-
-    <!-- Menu: Events under OJT root -->
-    <menuitem id="menu_ojt_event_link" name="Event Links" parent="menu_ojt_root" action="action_ojt_event_link" sequence="20"/>
-
     <!-- List view: compact listing of event links -->
     <record id="view_ojt_event_link_list" model="ir.ui.view">
         <field name="name">ojt.event.link.list</field>
