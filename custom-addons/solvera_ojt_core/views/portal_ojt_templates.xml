@@ -204,16 +204,14 @@
 
     <!-- Portal: add Join action column on Attendance -->
     <template id="portal_my_ojt_participant_detail_join_action"
-              inherit_id="solvera_ojt_core.portal_my_ojt_participant_detail">
-        <!-- Column header: Action -->
+            inherit_id="solvera_ojt_core.portal_my_ojt_participant_detail">
         <xpath expr="//div[contains(@class,'card-header')][contains(normalize-space(),'Attendance')]/following-sibling::div//thead/tr"
-               position="inside">
+            position="inside">
             <th class="text-end">Action</th>
         </xpath>
 
-        <!-- Row cell: Join button or dash -->
-        <xpath expr="//div[contains(@class,'card-header')][contains(normalize-space(),'Attendance')]/following-sibling::div//tbody//tr"
-               position="inside">
+        <xpath expr="//div[contains(@class,'card-header')][contains(normalize-space(),'Attendance')]/following-sibling::div//tbody/t[@t-foreach][@t-as='a']/tr"
+            position="inside">
             <td class="text-end">
                 <t t-if="a.event_link_id and a.event_link_id.online_meeting_url and a.qr_token">
                     <a t-att-href="a.join_url" class="btn btn-primary btn-sm">Join Online</a>
