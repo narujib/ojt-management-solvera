@@ -14,6 +14,7 @@
         'survey',
         'portal',
         'website',
+        'website_hr_recruitment',
         'mail',
     ],
     'data': [

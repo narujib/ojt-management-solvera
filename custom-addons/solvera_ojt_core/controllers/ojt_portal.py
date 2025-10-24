@@ -71,3 +71,17 @@ class OjtPortal(CustomerPortal):
             'ret': request.params.get('ret'),  # Pass-through return URL parameter
         })
         return request.render('solvera_ojt_core.portal_my_ojt_participant_detail', values)
+
+
+from odoo.addons.website_hr_recruitment.controllers.main import WebsiteHrRecruitment
+
+class OjtRecruitmentGuard(WebsiteHrRecruitment):
+
+    @http.route(
+        ['/jobs/apply/<model("hr.job"):job>'],
+        type='http', auth='public', website=True, csrf=False
+    )
+    def jobs_apply(self, job, **post):
+        if request.env.user._is_public():
+            return request.redirect('/web/login?redirect=' + request.httprequest.url)
+        return super().jobs_apply(job, **post)
