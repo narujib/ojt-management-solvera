@@ -79,7 +79,6 @@ class OjtEventLink(models.Model):
     def action_open_assignments(self):
         return self._action_open_records("ojt.assignment", "Assignments", [("event_link_id", "=", self.id)])
 
-    # Generation: ensure attendance rows exist for all batch participants
     def ensure_attendance_for_batch_participants(self):
         Participant = self.env["ojt.participant"].sudo()
         Attendance = self.env["ojt.attendance"].sudo()
@@ -89,6 +88,7 @@ class OjtEventLink(models.Model):
             participants = Participant.search([("batch_id", "=", rec.batch_id.id)])
             if not participants:
                 continue
+
             existing = Attendance.read_group(
                 domain=[("event_link_id", "=", rec.id)],
                 fields=["participant_id"],
@@ -99,17 +99,22 @@ class OjtEventLink(models.Model):
             for p in participants:
                 if p.id in existing_ids:
                     continue
-                to_create.append(
-                    {
-                        "batch_id": rec.batch_id.id,
-                        "event_link_id": rec.id,
-                        "participant_id": p.id,
-                        "presence": "absent",
-                        "method": "manual",  # will change on check-in
-                    }
-                )
+                to_create.append({
+                    "batch_id": rec.batch_id.id,
+                    "event_link_id": rec.id,
+                    "participant_id": p.id,
+                    "presence": "absent",
+                    "method": "manual",
+                })
             if to_create:
                 Attendance.create(to_create)
+
+            missing = Attendance.search([
+                ("event_link_id", "=", rec.id),
+                ("qr_token", "=", False),
+            ], limit=0)
+            for att in missing:
+                att.write({"qr_token": uuid4().hex})
 
     # Override: create and then backfill attendance
     @api.model

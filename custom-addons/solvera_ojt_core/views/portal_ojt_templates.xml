@@ -202,25 +202,72 @@
         </t>
     </template>
 
-    <!-- Portal: add Join action column on Attendance -->
+    <!-- Portal: add Join/QR action column on Attendance -->
     <template id="portal_my_ojt_participant_detail_join_action"
-            inherit_id="solvera_ojt_core.portal_my_ojt_participant_detail">
+              inherit_id="solvera_ojt_core.portal_my_ojt_participant_detail">
+        <!-- Column header: Action -->
         <xpath expr="//div[contains(@class,'card-header')][contains(normalize-space(),'Attendance')]/following-sibling::div//thead/tr"
-            position="inside">
+               position="inside">
             <th class="text-end">Action</th>
         </xpath>
 
+        <!-- Row cell: Join button, QR PNG, or dash -->
         <xpath expr="//div[contains(@class,'card-header')][contains(normalize-space(),'Attendance')]/following-sibling::div//tbody/t[@t-foreach][@t-as='a']/tr"
-            position="inside">
+               position="inside">
             <td class="text-end">
-                <t t-if="a.event_link_id and a.event_link_id.online_meeting_url and a.qr_token">
-                    <a t-att-href="a.join_url" class="btn btn-primary btn-sm">Join Online</a>
+                <t t-if="a.qr_token">
+                    <t t-if="a.event_link_id and a.event_link_id.online_meeting_url">
+                        <a t-att-href="a.join_url"
+                           class="btn btn-primary btn-sm"
+                           target="_blank" rel="noopener">Join Meeting</a>
+                    </t>
+                    <a t-att-href="'/ojt/qrpng/%s?mode=checkin' % a.qr_token"
+                       class="btn btn-secondary btn-sm"
+                       target="_blank" rel="noopener">QR Check-in</a>
                 </t>
                 <t t-else="">
                     <span class="text-muted">-</span>
                 </t>
             </td>
         </xpath>
+    </template>
+
+    <!-- Page: QR PNG viewer (client-generated) -->
+    <template id="portal_ojt_qr_png" name="OJT QR PNG">
+        <t t-call="portal.portal_layout">
+            <t t-set="val" t-value="qr_value"/>
+            <div class="container mt16">
+                <h4>Scan QR</h4>
+                <div class="my-3 d-flex justify-content-center">
+                    <img id="qrimg" alt="QR" width="512" height="512"/>
+                </div>
+                <div class="text-center">
+                    <a id="qr_dl" download="ojt-qr.png" class="btn btn-secondary btn-sm">Download PNG</a>
+                </div>
+            </div>
+
+            <!-- QR library (has QRCode.toDataURL API) -->
+            <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+            <script>
+                (function () {
+                    var val = "<t t-esc='val'/>";
+                    var img = document.getElementById('qrimg');
+                    var dl  = document.getElementById('qr_dl');
+
+                    function fail(msg){
+                        img.alt = msg || 'Failed to generate QR';
+                    }
+
+                    if (!window.QRCode) return fail('QR library failed to load');
+
+                    QRCode.toDataURL(val, { width: 512, margin: 1 }, function (err, url) {
+                        if (err || !url) return fail('Could not render QR');
+                        img.src = url;
+                        if (dl) dl.href = url;
+                    });
+                })();
+            </script>
+        </t>
     </template>
 
     <!-- Page: QR success -->
@@ -244,6 +291,63 @@
                 </div>
                 <a href="/my/ojt" class="btn btn-secondary btn-sm">Back to My OJT</a>
             </div>
+        </t>
+    </template>
+
+    <!-- Page: external redirect fallback for meeting links -->
+    <template id="portal_ojt_redirect" name="OJT External Redirect">
+        <t t-call="portal.portal_layout">
+            <t t-set="dest" t-value="target_url"/>
+            <t t-if="dest">
+                <meta t-att-content="'0;url=%s' % dest" http-equiv="refresh"/>
+                <div class="container mt16">
+                    <div class="alert alert-info">
+                        Redirecting to the meeting…
+                        If nothing happens, <a t-att-href="dest" target="_blank" rel="noopener">click here</a>.
+                    </div>
+                </div>
+                <script>
+                    (function(){
+                        try { window.location.replace("<t t-esc='dest'/>"); }
+                        catch(e) { window.location.href = "<t t-esc='dest'/>"; }
+                    })();
+                </script>
+            </t>
+            <t t-else="">
+                <div class="container mt16">
+                    <div class="alert alert-warning">Meeting link is not available.</div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- Page: client-side QR canvas (no /report/barcode) -->
+    <template id="portal_ojt_qr_client" name="OJT QR Canvas">
+        <t t-call="portal.portal_layout">
+            <t t-set="qrval" t-value="qr_value"/>
+            <div class="container mt16">
+                <h4>Scan QR</h4>
+                <div id="qrwrap" class="my-3 d-flex justify-content-center"></div>
+                <div class="text-center">
+                    <a t-att-href="qrval" target="_blank" rel="noopener" class="btn btn-link btn-sm">Open link</a>
+                </div>
+            </div>
+
+            <!-- CDN: QRCode.js -->
+            <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+            <script>
+                (function () {
+                    var val = "<t t-esc='qrval'/>";
+                    var el = document.getElementById('qrwrap');
+                    if (!el) return;
+                    if (window.QRCode) {
+                        new QRCode(el, { text: val, width: 512, height: 512 });
+                    } else {
+                        el.innerHTML = '<p>QR library failed to load. ' +
+                                       '<a href="'+ val +'" target="_blank" rel="noopener">Open link</a></p>';
+                    }
+                })();
+            </script>
         </t>
     </template>
 
